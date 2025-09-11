@@ -1,10 +1,9 @@
 import { ApolloClient, HttpLink } from "@apollo/client";
 import { InMemoryCache } from "@apollo/client";
 
-const publicBackendUrl =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
+const publicBackendUrl = process.env.BACKEND_URL ?? "http://localhost:4000";
 if (!publicBackendUrl) {
-  throw new Error("NEXT_PUBLIC_BACKEND_URL is not set");
+  throw new Error("BACKEND_URL is not set");
 }
 
 const normalizedUrl = publicBackendUrl.endsWith("/graphql")
