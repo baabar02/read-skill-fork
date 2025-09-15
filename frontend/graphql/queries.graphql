@@ -5,3 +5,32 @@ query GetUsers {
     email
   }
 }
+
+mutation AddBook(
+  $title: String!
+  $content: String!
+  $author: String
+  $chapters: Int
+  $categories: [String]
+  $image: [String]
+  $audio_url: [String]
+) {
+  addBook(
+    title: $title
+    content: $content
+    author: $author
+    chapters: $chapters
+    categories: $categories
+    image: $image
+    audio_url: $audio_url
+  ) {
+    id
+    title
+    author
+    chapters
+    categories
+    content
+    image
+    audio_url
+  }
+}
