@@ -1,0 +1,39 @@
+mutation GenerateQuestionsForBook(
+  $bookId: ID!
+  $chapterId: ID
+  $difficulty: String
+  $questionType: String
+  $numberOfQuestions: Int
+  $language: String
+) {
+  generateQuestionsForBook(
+    bookId: $bookId
+    chapterId: $chapterId
+    difficulty: $difficulty
+    questionType: $questionType
+    numberOfQuestions: $numberOfQuestions
+    language: $language
+  ) {
+    id
+    bookId
+    chapterId
+    question
+    answer
+    option
+    createdAt
+    updatedAt
+  }
+}
+
+query GetQuestionsForBook($bookId: ID!, $chapterId: ID) {
+  getQuestionsForBook(bookId: $bookId, chapterId: $chapterId) {
+    id
+    bookId
+    chapterId
+    question
+    answer
+    option
+    createdAt
+    updatedAt
+  }
+}
