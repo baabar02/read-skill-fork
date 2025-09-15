@@ -1,7 +1,7 @@
 import { ApolloClient, HttpLink } from "@apollo/client";
 import { InMemoryCache } from "@apollo/client";
 
-const publicBackendUrl = process.env.BACKEND_URL ?? "http://localhost:4000";
+const publicBackendUrl = process.env.BACKEND_URL ?? "http://localhost:4200";
 if (!publicBackendUrl) {
   throw new Error("BACKEND_URL is not set");
 }
