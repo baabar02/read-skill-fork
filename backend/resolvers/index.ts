@@ -6,10 +6,15 @@ export const resolvers = {
     createUser: Mutation.createUser,
     addBook: Mutation.addBook,
     addContent: Mutation.addContent,
-    generateQuestionsForBook: Mutation.generateQuestionsForBook,
+    generateQuestions: Mutation.generateQuestions,
+    generateQuestionsWithContent: Mutation.generateQuestionsWithContent,
+    generateMCQQuestions: Mutation.generateMCQQuestions,
+    submitAnswer: Mutation.submitAnswer,
   },
   Query: {
     getUsers: Query.getUsers,
-    getQuestionsForBook: Mutation.getQuestionsForBook,
+    getQuestionsForBook: Query.getQuestionsForBook,
+    getUserAnswers: Query.getUserAnswers,
+    getUserScore: Query.getUserScore,
   },
 };

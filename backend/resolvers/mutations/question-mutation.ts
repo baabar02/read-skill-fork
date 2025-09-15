@@ -1,103 +1,67 @@
-import {
-  Question,
-  type Question as QuestionType,
-} from "../../models/question-model";
+import { OpenAI } from "openai";
+
 import { Book } from "../../models/book-model";
 import { Chapter } from "../../models/chapter-model";
-import {
-  generateQuestions,
-  type QuestionGenerationRequest,
-} from "../../utils/ai-service";
 
-export const generateQuestionsForBook = async (
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export const generateQuestionsWithContent = async (
   _: unknown,
   args: {
-    bookId: string;
+    content: string;
+    bookId?: string;
     chapterId?: string;
     difficulty?: "easy" | "medium" | "hard";
-    questionType?: "multiple_choice" | "open_ended" | "true_false";
     numberOfQuestions?: number;
-    language?: string;
   }
 ) => {
   try {
-    const book = await Book.findById(args.bookId);
-    if (!book) {
-      throw new Error("Book not found");
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OpenAI API key is not configured");
     }
 
-    let content = "";
-    if (args.chapterId) {
-      const chapter = await Chapter.findById(args.chapterId);
-      if (!chapter) {
-        throw new Error("Chapter not found");
-      }
-      content = chapter.content.join(" ");
-    } else {
-      content = book.content.join(" ");
+    if (!args.content || args.content.trim() === "") {
+      throw new Error("Текст хоосон байна");
     }
 
-    if (!content.trim()) {
-      throw new Error("No content available to generate questions from");
-    }
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `Чи сургалтын туслах. Хэрэглэгчийн өгсөн текст дээр үндэслэж ${
+            args.numberOfQuestions || 5
+          } асуулт зохио. Хэмжээ: ${args.difficulty || "medium"}.`,
+        },
+        {
+          role: "user",
+          content: args.content,
+        },
+      ],
+    });
 
-    // Prepare AI request
-    const aiRequest: QuestionGenerationRequest = {
-      content,
+    const result = completion.choices[0]?.message?.content;
+    if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
+
+    const questions = result
+      .split("\n")
+      .map((q) => q.trim().replace(/^\d+\.\s*/, ""))
+      .filter((q) => q.length > 0);
+
+    return {
+      questions,
+      bookId: args.bookId || null,
+      chapterId: args.chapterId || null,
+      content: args.content,
       difficulty: args.difficulty || "medium",
-      questionType: args.questionType || "multiple_choice",
-      numberOfQuestions: args.numberOfQuestions || 5,
-      language: args.language || "Mongolian",
+      numberOfQuestions: questions.length,
     };
-
-    // Generate questions using AI
-    const generatedQuestions = await generateQuestions(aiRequest);
-
-    // Save questions to database
-    const savedQuestions = [];
-    for (const q of generatedQuestions) {
-      const question = new Question({
-        chapterId: args.chapterId || null,
-        bookId: args.bookId,
-        question: q.question,
-        answer: q.answer,
-        option: q.options ? JSON.stringify(q.options) : null,
-      });
-      await question.save();
-      savedQuestions.push(question);
-    }
-
-    return savedQuestions;
-  } catch (error) {
-    console.error("Error generating questions:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    throw new Error(`Failed to generate questions: ${errorMessage}`);
+  } catch (error: any) {
+    console.error("OpenAI Error:", error);
+    throw new Error(error.message || "Асуулт үүсгэхэд алдаа гарлаа");
   }
 };
 
-export const getQuestionsForBook = async (
-  _: unknown,
-  args: {
-    bookId: string;
-    chapterId?: string;
-  }
-) => {
-  try {
-    let query: any = {
-      bookId: args.bookId,
-    };
-    if (args.chapterId) {
-      query.chapterId = args.chapterId;
-    }
-
-    const questions = await (Question as any)
-      .find(query)
-      .populate("bookId")
-      .populate("chapterId");
-    return questions;
-  } catch (error) {
-    console.error("Error fetching questions:", error);
-    throw new Error("Failed to fetch questions");
-  }
-};
+// Generate MCQ questions and save to database
