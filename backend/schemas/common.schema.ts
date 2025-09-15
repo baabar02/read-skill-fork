@@ -69,5 +69,6 @@ type Answer {
       numberOfQuestions: Int
       language: String
     ): [Question!]!
+    generateQuestions(chapter: String!): [String!]!
   }
 `;
