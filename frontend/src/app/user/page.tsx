@@ -23,7 +23,6 @@ const activities = [
 const UserPage = () => {
   return (
     <section className="min-h-screen flex flex-col max-w-6xl mx-auto px-6 py-0 bg-gradient-to-b from-pink-50 via-white to-sky-50 rounded-3xl shadow-inner">
-      {/* Дээд хэсэг */}
       <div className="flex-1 min-h-0 py-12">
         <header className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6">
           <div className="text-center md:text-left">
@@ -36,9 +35,7 @@ const UserPage = () => {
           </div>
         </header>
 
-        {/* Дээд grid - нэг мөрөнд 2 item */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 auto-rows-min">
-          {/* Профайл карт */}
           <motion.article
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -79,7 +76,6 @@ const UserPage = () => {
             </div>
           </motion.article>
 
-          {/* Өнөөдрийн түүх */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -108,7 +104,6 @@ const UserPage = () => {
         </div>
       </div>
 
-      {/* Доод хэсэг */}
       <div className="flex-1 min-h-0 px-6 py-8 -mt-20 overflow-auto">
         <h2 className="text-2xl font-bold mb-6 text-pink-600">
           Үйл ажиллагаанууд
