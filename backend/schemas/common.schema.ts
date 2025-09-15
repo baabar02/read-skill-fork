@@ -52,23 +52,68 @@ type Answer {
   updatedAt: String!
 }
 
+type GeneratedQuestions {
+  questions: [String!]!
+  bookId: ID
+  chapterId: ID
+  content: String!
+  difficulty: String!
+  numberOfQuestions: Int!
+}
+
+type AnswerResult {
+  id: ID!
+  questionId: ID!
+  userAnswer: String!
+  correctAnswer: String!
+  isCorrect: Boolean!
+  options: JSON
+  explanation: String
+}
+
+type UserScore {
+  userId: ID!
+  bookId: ID
+  chapterId: ID
+  totalQuestions: Int!
+  correctAnswers: Int!
+  score: Int!
+  percentage: Int!
+}
+
   type Query {
     getUsers: [User!]!
-    getQuestionsForBook(bookId: ID!, chapterId: ID): [Question!]!
+    getQuestionsForBook(bookId: ID, chapterId: ID): [Question!]!
+    getUserAnswers(userId: ID!, bookId: ID, chapterId: ID): [Answer!]!
+    getUserScore(userId: ID!, bookId: ID, chapterId: ID): UserScore!
   }
 
   type Mutation {
     createUser(name: String!, email: String!): User!
     addBook(title: String!, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]): Book!
     addContent(bookId:ID!, title:String, content:[String], audio_url:String): Chapter!
-    generateQuestionsForBook(
-      bookId: ID!
+    generateQuestions(chapter: String!): [String!]!
+    generateQuestionsWithContent(
+      content: String!
+      bookId: ID
       chapterId: ID
       difficulty: String
-      questionType: String
+      numberOfQuestions: Int
+    ): GeneratedQuestions!
+    generateMCQQuestions(
+      content: String!
+      bookId: ID
+      chapterId: ID
+      difficulty: String
       numberOfQuestions: Int
       language: String
     ): [Question!]!
-    generateQuestions(chapter: String!): [String!]!
+    submitAnswer(
+      questionId: ID!
+      userId: ID!
+      userAnswer: String!
+      bookId: ID
+      chapterId: ID
+    ): AnswerResult!
   }
 `;
