@@ -7,9 +7,10 @@ export interface Question {
   bookId: Schema.Types.ObjectId;
   question: string;
   answer: string;
-  option?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  option?: {
+    options: string[];
+    explanation?: string;
+  };
 }
 
 const questionSchema = new Schema<Question>(
@@ -18,7 +19,12 @@ const questionSchema = new Schema<Question>(
     bookId: { type: Schema.Types.ObjectId, required: true, ref: "Book" },
     question: { type: String, required: true },
     answer: { type: String, required: true },
-    option: { type: String, required: false },
+    option: {
+      type: {
+        options: { type: [String], required: true },
+        explanation: { type: String, required: false },
+      },
+    },
   },
   { timestamps: true }
 );

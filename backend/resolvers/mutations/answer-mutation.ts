@@ -8,24 +8,20 @@ export const submitAnswer = async (
     userId: string;
     userAnswer: string;
     bookId?: string;
-    chapterId?: string;
   }
 ) => {
   try {
-    // Find the question to get the correct answer
     const questionDoc = await QuestionModel.findById(args.questionId);
 
     if (!questionDoc) {
       throw new Error("Question not found");
     }
 
-    // Check if answer is correct
     const isCorrect = questionDoc.answer === args.userAnswer;
 
-    // Create answer record
     const answer = new Answer({
       bookId: args.bookId || questionDoc.bookId,
-      chapterId: args.chapterId || questionDoc.chapterId,
+      chapterId: questionDoc.chapterId,
       questionId: args.questionId,
       userId: args.userId,
       answer: args.userAnswer,
@@ -34,14 +30,9 @@ export const submitAnswer = async (
 
     await answer.save();
 
-    // Get question options for response
     let options = null;
-    if (questionDoc.option) {
-      try {
-        options = JSON.parse(questionDoc.option);
-      } catch (e) {
-        console.error("Error parsing question options:", e);
-      }
+    if (questionDoc.option && Array.isArray(questionDoc.option.options)) {
+      options = questionDoc.option.options;
     }
 
     return {
@@ -51,7 +42,6 @@ export const submitAnswer = async (
       correctAnswer: questionDoc.answer,
       isCorrect: isCorrect,
       options: options,
-      explanation: options?.explanation || null,
     };
   } catch (error: any) {
     console.error("Error submitting answer:", error);
