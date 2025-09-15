@@ -1,7 +1,7 @@
 // codegen.ts
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-const rawSchemaUrl = process.env.BACKEND_URL || "http://localhost:4000";
+const rawSchemaUrl = process.env.BACKEND_URL || "http://localhost:4200";
 const schemaUrl = rawSchemaUrl.endsWith("/graphql")
   ? rawSchemaUrl
   : `${rawSchemaUrl.replace(/\/$/, "")}/graphql`;

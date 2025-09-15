@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use client'
 
 import React, { useState } from 'react'
@@ -207,3 +208,12 @@ const UserPage = () => {
 }
 
 export default UserPage
+=======
+import { Card } from "@/components/ui/card";
+
+const UserPage = () => {
+  return <Card className="bg-[url(/book.png)] h-screen"></Card>;
+};
+
+export default UserPage;
+>>>>>>> 4d51c72 (admin insert text)
