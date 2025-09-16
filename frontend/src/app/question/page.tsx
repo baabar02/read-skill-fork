@@ -12,6 +12,7 @@ import BookManager from "./_components/BookManager";
 import SimpleQuestionGenerator from "./_components/SimpleQuestionGenerator";
 import FourOptions from "./_components/FourOptions";
 import SentenceMatching from "./_components/SentenceMatching";
+import BookSelector from "./_components/FourOptions";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("quiz");
@@ -67,7 +68,7 @@ export default function Page() {
           </TabsContent>
 
           <TabsContent value="demo" className="space-y-6">
-            <FourOptions />
+           <BookSelector/>
           </TabsContent>
 
           <TabsContent value="matching" className="space-y-6">

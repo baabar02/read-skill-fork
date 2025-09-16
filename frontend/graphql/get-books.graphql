@@ -1,0 +1,12 @@
+query GetBooks {
+  getBooks {
+    id
+    title
+    chapters
+    author
+    categories
+    content
+    image
+    audio_url
+  }
+}

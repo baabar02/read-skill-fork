@@ -17,6 +17,7 @@ export const resolvers = {
     getUserAnswers: Query.getUserAnswers,
     getUserScore: Query.getUserScore,
     getBookById: Query.getBookById,
+    getBooks: Query.getBooks,
   },
   Question: {
     option: (parent: any) => {
