@@ -9,7 +9,6 @@ connectToDb();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true,
 });
 
 const { url } = await startStandaloneServer(server, {
