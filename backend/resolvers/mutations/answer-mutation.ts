@@ -1,6 +1,7 @@
 import { Answer } from "../../models/answer-model";
-import { QuestionModel } from "../../models/question-model";
+import { Question } from "../../models/question-model";
 
+// Submit an answer for a question
 export const submitAnswer = async (
   _: unknown,
   args: {
@@ -13,19 +14,19 @@ export const submitAnswer = async (
 ) => {
   try {
     // Find the question to get the correct answer
-    const questionDoc = await QuestionModel.findById(args.questionId);
-
+    const questionDoc = await Question.findById(args.questionId).exec();
     if (!questionDoc) {
       throw new Error("Question not found");
     }
+    const question = questionDoc as any;
 
     // Check if answer is correct
-    const isCorrect = questionDoc.answer === args.userAnswer;
+    const isCorrect = question.answer === args.userAnswer;
 
     // Create answer record
     const answer = new Answer({
-      bookId: args.bookId || questionDoc.bookId,
-      chapterId: args.chapterId || questionDoc.chapterId,
+      bookId: args.bookId || question.bookId,
+      chapterId: args.chapterId || question.chapterId,
       questionId: args.questionId,
       userId: args.userId,
       answer: args.userAnswer,
@@ -35,10 +36,10 @@ export const submitAnswer = async (
     await answer.save();
 
     // Get question options for response
-    let options = null;
-    if (questionDoc.option) {
+    let parsedOptions = null;
+    if (question.option) {
       try {
-        options = JSON.parse(questionDoc.option);
+        parsedOptions = JSON.parse(question.option);
       } catch (e) {
         console.error("Error parsing question options:", e);
       }
@@ -48,10 +49,15 @@ export const submitAnswer = async (
       id: answer._id,
       questionId: args.questionId,
       userAnswer: args.userAnswer,
-      correctAnswer: questionDoc.answer,
+      correctAnswer: question.answer,
       isCorrect: isCorrect,
-      options: options,
-      explanation: options?.explanation || null,
+      options: parsedOptions
+        ? {
+            options: parsedOptions.options || [],
+            explanation: parsedOptions.explanation || "",
+          }
+        : null,
+      explanation: parsedOptions?.explanation || null,
     };
   } catch (error: any) {
     console.error("Error submitting answer:", error);

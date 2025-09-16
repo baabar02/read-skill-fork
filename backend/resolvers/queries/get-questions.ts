@@ -1,4 +1,4 @@
-import { QuestionModel } from "../../models/question-model";
+import { Question } from "../../models/question-model";
 
 // Get questions for a book/chapter
 export const getQuestionsForBook = async (
@@ -17,7 +17,7 @@ export const getQuestionsForBook = async (
       query.chapterId = args.chapterId;
     }
 
-    const questions = await (QuestionModel as any)
+    const questions = await (Question )
       .find(query)
       .populate("bookId")
       .populate("chapterId");

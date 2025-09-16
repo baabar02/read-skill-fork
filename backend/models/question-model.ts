@@ -1,7 +1,6 @@
-import { model, models, Schema } from "mongoose";
-import type { InferSchemaType } from "mongoose";
+import { model, models, Schema, Document } from "mongoose";
 
-export interface Question {
+export interface Question extends Document {
   _id: Schema.Types.ObjectId;
   chapterId?: Schema.Types.ObjectId;
   bookId: Schema.Types.ObjectId;
@@ -22,6 +21,5 @@ const questionSchema = new Schema<Question>(
   },
   { timestamps: true }
 );
-export type Questions = InferSchemaType<typeof questionSchema>;
 
-export const QuestionModel = model<Question>("Question", questionSchema);
+export const Question = model<Question>("Question", questionSchema);

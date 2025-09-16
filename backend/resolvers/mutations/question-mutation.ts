@@ -1,5 +1,5 @@
 import { OpenAI } from "openai";
-
+import { Question } from "../../models/question-model";
 import { Book } from "../../models/book-model";
 import { Chapter } from "../../models/chapter-model";
 

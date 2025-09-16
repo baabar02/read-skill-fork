@@ -35,7 +35,7 @@ type Question {
   chapterId: ID
   question: String!
   answer: String!
-  option: String
+  option: QuestionOptions
   createdAt: String!
   updatedAt: String!
 }
@@ -61,13 +61,18 @@ type GeneratedQuestions {
   numberOfQuestions: Int!
 }
 
+type QuestionOptions {
+  options: [String!]!
+  explanation: String!
+}
+
 type AnswerResult {
   id: ID!
   questionId: ID!
   userAnswer: String!
   correctAnswer: String!
   isCorrect: Boolean!
-  options: [String]
+  options: QuestionOptions
   explanation: String
 }
 

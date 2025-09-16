@@ -1,5 +1,5 @@
 import { OpenAI } from "openai";
-import { QuestionModel } from "../../models/question-model";
+import { Question } from "../../models/question-model";
 import { Book } from "../../models/book-model";
 import { Chapter } from "../../models/chapter-model";
 
@@ -10,7 +10,7 @@ const client = new OpenAI({
 export const generateMCQQuestions = async (
   _: unknown,
   args: {
-    content: string;
+    content?: string;
     bookId?: string;
     chapterId?: string;
     difficulty?: "easy" | "medium" | "hard";
@@ -23,19 +23,31 @@ export const generateMCQQuestions = async (
       throw new Error("OpenAI API key is not configured");
     }
 
-    if (!args.content || args.content.trim() === "") {
-      throw new Error("Текст хоосон байна");
-    }
+    // ---- Агуулга ачаалж авах ---- //
+    let contentToUse = args.content?.trim();
 
-    // Validate bookId if provided
-    if (args.bookId) {
-      const book = await Book.findById(args.bookId);
+    if (!contentToUse) {
+      if (!args.bookId) {
+        throw new Error("content эсвэл bookId заавал байх ёстой");
+      }
+
+      const book = await Book.findById(args.bookId).lean();
       if (!book) {
         throw new Error("Book not found");
       }
+
+      if (
+        !book.content ||
+        !Array.isArray(book.content) ||
+        book.content.length === 0
+      ) {
+        throw new Error("Номын контент олдсонгүй");
+      }
+
+      contentToUse = book.content.join("\n"); // массив байвал нэгтгэх
     }
 
-    // Validate chapterId if provided
+    // ---- chapterId шалгах (хэрвээ өгөгдсөн бол) ---- //
     if (args.chapterId) {
       const chapter = await Chapter.findById(args.chapterId);
       if (!chapter) {
@@ -43,6 +55,7 @@ export const generateMCQQuestions = async (
       }
     }
 
+    // ---- OpenAI-гаар олон сонголттой асуулт үүсгэх ---- //
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -61,12 +74,12 @@ export const generateMCQQuestions = async (
           3. Зөв хариулт (A, B, C, эсвэл D)
           4. Тайлбар (яагаад энэ хариулт зөв болохыг тайлбарлана)
           
-          JSON форматаар хариулна уу:
-          [{"question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "A", "explanation": "..."}]`,
+          Object форматаар хариулна уу:
+          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]`,
         },
         {
           role: "user",
-          content: args.content,
+          content: contentToUse,
         },
       ],
     });
@@ -74,7 +87,7 @@ export const generateMCQQuestions = async (
     const result = completion.choices[0]?.message?.content;
     if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
 
-    // Parse JSON response
+    // ---- JSON parse хийх ---- //
     const jsonMatch = result.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       throw new Error("AI-аас буруу форматаар хариу ирсэн байна");
@@ -82,18 +95,18 @@ export const generateMCQQuestions = async (
 
     const questionsData = JSON.parse(jsonMatch[0]);
 
-    // Save questions to database
+    // ---- DB-д хадгалах ---- //
     const savedQuestions = [];
     for (const q of questionsData) {
-      const question = new QuestionModel({
+      const question = new Question({
         bookId: args.bookId || null,
         chapterId: args.chapterId || null,
         question: q.question,
         answer: q.correctAnswer,
-        option: JSON.stringify({
-          options: q.options,
+        options: {
+          option: q.options,
           explanation: q.explanation,
-        }),
+        },
       });
       await question.save();
       savedQuestions.push(question);
