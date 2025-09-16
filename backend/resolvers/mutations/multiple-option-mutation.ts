@@ -1,5 +1,5 @@
 import { OpenAI } from "openai";
-import { QuestionModel } from "../../models/question-model";
+import { Question } from "../../models/question-model";
 import { Book } from "../../models/book-model";
 import { Chapter } from "../../models/chapter-model";
 
@@ -74,8 +74,8 @@ export const generateMCQQuestions = async (
           3. Зөв хариулт (A, B, C, эсвэл D)
           4. Тайлбар (яагаад энэ хариулт зөв болохыг тайлбарлана)
           
-          JSON форматаар хариулна уу:
-          [{"question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": "A", "explanation": "..."}]`,
+          Object форматаар хариулна уу:
+          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]`,
         },
         {
           role: "user",
@@ -98,7 +98,7 @@ export const generateMCQQuestions = async (
     // ---- DB-д хадгалах ---- //
     const savedQuestions = [];
     for (const q of questionsData) {
-      const question = new QuestionModel({
+      const question = new Question({
         bookId: args.bookId || null,
         chapterId: args.chapterId || null,
         question: q.question,

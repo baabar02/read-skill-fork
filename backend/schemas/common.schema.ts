@@ -2,6 +2,7 @@ export const typeDefs = `
   type User {
     id: ID!
     name: String!
+    email: String!
   }
 
   type Book {
@@ -34,7 +35,7 @@ type Question {
   chapterId: ID
   question: String!
   answer: String!
-  option: String
+  option: QuestionOptions
   createdAt: String!
   updatedAt: String!
 }
@@ -59,9 +60,10 @@ type GeneratedQuestions {
   difficulty: String!
   numberOfQuestions: Int!
 }
-type Options {
-options:[String]
-explanation:String
+
+type QuestionOptions {
+  options: [String!]!
+  explanation: String!
 }
 
 type AnswerResult {
@@ -70,8 +72,8 @@ type AnswerResult {
   userAnswer: String!
   correctAnswer: String!
   isCorrect: Boolean!
-  option:Options 
- 
+  options: QuestionOptions
+  explanation: String
 }
 
 type UserScore {
@@ -92,14 +94,19 @@ type UserScore {
   }
 
   type Mutation {
-    createUser(name: String!, email: String): User!
+    createUser(name: String!, email: String!): User!
     addBook(title: String!, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]): Book!
     addContent(bookId:ID!, title:String, content:[String], audio_url:String): Chapter!
-    generateQuestions(bookId: String): [String!]!
-
-    generateQuestionsWithContent(content: String, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int): GeneratedQuestions!
+    generateQuestions(chapter: String!): [String!]!
+    generateQuestionsWithContent(
+      content: String!
+      bookId: ID
+      chapterId: ID
+      difficulty: String
+      numberOfQuestions: Int
+    ): GeneratedQuestions!
     generateMCQQuestions(
-      content: String
+      content: String!
       bookId: ID
       chapterId: ID
       difficulty: String
@@ -108,9 +115,10 @@ type UserScore {
     ): [Question!]!
     submitAnswer(
       questionId: ID!
-      userAnswer: ID
-      userId:ID
+      userId: ID!
+      userAnswer: String!
       bookId: ID
+      chapterId: ID
     ): AnswerResult!
   }
 `;

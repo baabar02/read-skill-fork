@@ -17,4 +17,17 @@ export const resolvers = {
     getUserAnswers: Query.getUserAnswers,
     getUserScore: Query.getUserScore,
   },
+  Question: {
+    option: (parent: any) => {
+      if (parent.option && typeof parent.option === "string") {
+        try {
+          return JSON.parse(parent.option);
+        } catch (e) {
+          console.error("Error parsing question options:", e);
+          return null;
+        }
+      }
+      return parent.option;
+    },
+  },
 };
