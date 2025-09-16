@@ -67,7 +67,7 @@ type AnswerResult {
   userAnswer: String!
   correctAnswer: String!
   isCorrect: Boolean!
-  options: JSON
+  options: [String]
   explanation: String
 }
 
@@ -86,6 +86,7 @@ type UserScore {
     getQuestionsForBook(bookId: ID, chapterId: ID): [Question!]!
     getUserAnswers(userId: ID!, bookId: ID, chapterId: ID): [Answer!]!
     getUserScore(userId: ID!, bookId: ID, chapterId: ID): UserScore!
+    getBooks: [Book!]!
   }
 
   type Mutation {

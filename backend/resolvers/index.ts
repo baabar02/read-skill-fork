@@ -16,5 +16,6 @@ export const resolvers = {
     getQuestionsForBook: Query.getQuestionsForBook,
     getUserAnswers: Query.getUserAnswers,
     getUserScore: Query.getUserScore,
+    getBooks: Query.getBooks,
   },
 };
