@@ -51,6 +51,7 @@ type AnswerResult = {
 };
 
 export default function BackendConnectedQuiz() {
+  const [bookId, setBookId] = useState<string>("");
   // State management
   const [content, setContent] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
@@ -90,6 +91,7 @@ export default function BackendConnectedQuiz() {
           difficulty,
           numberOfQuestions: parseInt(numberOfQuestions.toString()),
           language,
+          bookId,
         },
       });
 
@@ -181,6 +183,7 @@ export default function BackendConnectedQuiz() {
                 onChange={(e) => setContent(e.target.value)}
                 className="min-h-[120px]"
               />
+              {/* <p onClick={}></p> */}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -194,6 +197,21 @@ export default function BackendConnectedQuiz() {
                     <SelectItem value="easy">Easy</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Label htmlFor="book">Select Book</Label>
+                <Select value={bookId} onValueChange={setBookId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a Book" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="68c7a4a33571925f591602ea">
+                      Book 1
+                    </SelectItem>
+                    <SelectItem value="68c8d45bfbe94c8fdaae725e">
+                      Book 2
+                    </SelectItem>
+                    {/* Бодит bookId-г ашиглана */}
                   </SelectContent>
                 </Select>
               </div>

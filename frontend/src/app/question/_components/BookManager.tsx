@@ -38,6 +38,8 @@ export default function BookManager() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [addBook] = useMutation(AddBookDocument);
+  console.log(addBook, "add");
+  
 
   const handleInputChange = (field: string, value: string | number) => {
     setFormData((prev) => ({

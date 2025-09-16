@@ -16,6 +16,10 @@ export const generateMCQQuestions = async (
     difficulty?: "easy" | "medium" | "hard";
     numberOfQuestions?: number;
     language?: string;
+    option: {
+      options: string[];
+      explanation: string;
+    };
   }
 ) => {
   try {
@@ -75,7 +79,9 @@ export const generateMCQQuestions = async (
           4. Тайлбар (яагаад энэ хариулт зөв болохыг тайлбарлана)
           
           Object форматаар хариулна уу:
-          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]`,
+          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]
+         ONLY respond with valid JSON array, no explanations, no markdown, no extra text, no trailing commas, and use double quotes.
+`,
         },
         {
           role: "user",
@@ -86,7 +92,7 @@ export const generateMCQQuestions = async (
 
     const result = completion.choices[0]?.message?.content;
     if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
-
+    console.log(result);
     // ---- JSON parse хийх ---- //
     const jsonMatch = result.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
@@ -103,8 +109,8 @@ export const generateMCQQuestions = async (
         chapterId: args.chapterId || null,
         question: q.question,
         answer: q.correctAnswer,
-        options: {
-          option: q.options,
+        option: {
+          options: q.options,
           explanation: q.explanation,
         },
       });
