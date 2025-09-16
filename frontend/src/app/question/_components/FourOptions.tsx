@@ -33,6 +33,8 @@ const QUESTIONS: Question[] = [
 ];
 
 export default function FourOptions() {
+
+  // const {data} = 
   const [selected, setSelected] = useState<Record<number, number | null>>(() => {
     const init: Record<number, number | null> = {};
     QUESTIONS.forEach((q) => (init[q.id] = null));

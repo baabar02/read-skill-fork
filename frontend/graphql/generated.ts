@@ -149,10 +149,17 @@ export type MutationSubmitAnswerArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getBookById: Book;
+  getBooks: Array<Book>;
   getQuestionsForBook: Array<Question>;
   getUserAnswers: Array<Answer>;
   getUserScore: UserScore;
   getUsers: Array<User>;
+};
+
+
+export type QueryGetBookByIdArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
