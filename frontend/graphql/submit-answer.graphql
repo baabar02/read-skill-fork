@@ -1,0 +1,26 @@
+mutation SubmitAnswer(
+  $questionId: ID!
+  $userId: ID!
+  $userAnswer: String!
+  $bookId: ID
+  $chapterId: ID
+) {
+  submitAnswer(
+    questionId: $questionId
+    userId: $userId
+    userAnswer: $userAnswer
+    bookId: $bookId
+    chapterId: $chapterId
+  ) {
+    id
+    questionId
+    userAnswer
+    correctAnswer
+    isCorrect
+    options {
+      options
+      explanation
+    }
+    explanation
+  }
+}
