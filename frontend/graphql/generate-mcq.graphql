@@ -1,0 +1,29 @@
+mutation GenerateMCQQuestions(
+  $content: String!
+  $bookId: ID
+  $chapterId: ID
+  $difficulty: String
+  $numberOfQuestions: Int
+  $language: String
+) {
+  generateMCQQuestions(
+    content: $content
+    bookId: $bookId
+    chapterId: $chapterId
+    difficulty: $difficulty
+    numberOfQuestions: $numberOfQuestions
+    language: $language
+  ) {
+    id
+    bookId
+    chapterId
+    question
+    answer
+    option {
+      options
+      explanation
+    }
+    createdAt
+    updatedAt
+  }
+}

@@ -1,11 +1,3 @@
-query GetUsers {
-  getUsers {
-    id
-    name
-    email
-  }
-}
-
 mutation AddBook(
   $title: String!
   $content: String!
