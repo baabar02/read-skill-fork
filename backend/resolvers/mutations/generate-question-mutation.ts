@@ -6,16 +6,16 @@ const client = new OpenAI({
 
 export const generateQuestions = async (
   _: unknown,
-  { bookId }: { bookId: string }
+  { chapter }: { chapter: string }
 ) => {
   try {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error("OpenAI API key is not configured");
     }
 
-    // if (!chapter || chapter.trim() === "") {
-    //   throw new Error("Текст хоосон байна");
-    // }
+    if (!chapter || chapter.trim() === "") {
+      throw new Error("Текст хоосон байна");
+    }
 
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
@@ -27,7 +27,7 @@ export const generateQuestions = async (
         },
         {
           role: "user",
-          content: bookId,
+          content: chapter,
         },
       ],
     });
