@@ -250,6 +250,18 @@ export type GenerateQuestionsMutationVariables = Exact<{
 
 export type GenerateQuestionsMutation = { __typename?: 'Mutation', generateQuestions: Array<string> };
 
+export type GetBookByIdQueryVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type GetBookByIdQuery = { __typename?: 'Query', getBookById: { __typename?: 'Book', id: string, title: string, chapters: number, author: string, categories: Array<string>, content: Array<string>, image: Array<string>, audio_url: Array<string> } };
+
+export type GetBooksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBooksQuery = { __typename?: 'Query', getBooks: Array<{ __typename?: 'Book', id: string, title: string, chapters: number, author: string, categories: Array<string>, content: Array<string>, image: Array<string>, audio_url: Array<string> }> };
+
 export type GetQuestionsQueryVariables = Exact<{
   bookId?: InputMaybe<Scalars['ID']['input']>;
   chapterId?: InputMaybe<Scalars['ID']['input']>;
@@ -424,6 +436,99 @@ export function useGenerateQuestionsMutation(baseOptions?: Apollo.MutationHookOp
 export type GenerateQuestionsMutationHookResult = ReturnType<typeof useGenerateQuestionsMutation>;
 export type GenerateQuestionsMutationResult = Apollo.MutationResult<GenerateQuestionsMutation>;
 export type GenerateQuestionsMutationOptions = Apollo.BaseMutationOptions<GenerateQuestionsMutation, GenerateQuestionsMutationVariables>;
+export const GetBookByIdDocument = gql`
+    query GetBookById($bookId: ID!) {
+  getBookById(bookId: $bookId) {
+    id
+    title
+    chapters
+    author
+    categories
+    content
+    image
+    audio_url
+  }
+}
+    `;
+
+/**
+ * __useGetBookByIdQuery__
+ *
+ * To run a query within a React component, call `useGetBookByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBookByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBookByIdQuery({
+ *   variables: {
+ *      bookId: // value for 'bookId'
+ *   },
+ * });
+ */
+export function useGetBookByIdQuery(baseOptions: Apollo.QueryHookOptions<GetBookByIdQuery, GetBookByIdQueryVariables> & ({ variables: GetBookByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBookByIdQuery, GetBookByIdQueryVariables>(GetBookByIdDocument, options);
+      }
+export function useGetBookByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBookByIdQuery, GetBookByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBookByIdQuery, GetBookByIdQueryVariables>(GetBookByIdDocument, options);
+        }
+export function useGetBookByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBookByIdQuery, GetBookByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBookByIdQuery, GetBookByIdQueryVariables>(GetBookByIdDocument, options);
+        }
+export type GetBookByIdQueryHookResult = ReturnType<typeof useGetBookByIdQuery>;
+export type GetBookByIdLazyQueryHookResult = ReturnType<typeof useGetBookByIdLazyQuery>;
+export type GetBookByIdSuspenseQueryHookResult = ReturnType<typeof useGetBookByIdSuspenseQuery>;
+export type GetBookByIdQueryResult = Apollo.QueryResult<GetBookByIdQuery, GetBookByIdQueryVariables>;
+export const GetBooksDocument = gql`
+    query GetBooks {
+  getBooks {
+    id
+    title
+    chapters
+    author
+    categories
+    content
+    image
+    audio_url
+  }
+}
+    `;
+
+/**
+ * __useGetBooksQuery__
+ *
+ * To run a query within a React component, call `useGetBooksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBooksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBooksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBooksQuery(baseOptions?: Apollo.QueryHookOptions<GetBooksQuery, GetBooksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBooksQuery, GetBooksQueryVariables>(GetBooksDocument, options);
+      }
+export function useGetBooksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBooksQuery, GetBooksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBooksQuery, GetBooksQueryVariables>(GetBooksDocument, options);
+        }
+export function useGetBooksSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBooksQuery, GetBooksQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBooksQuery, GetBooksQueryVariables>(GetBooksDocument, options);
+        }
+export type GetBooksQueryHookResult = ReturnType<typeof useGetBooksQuery>;
+export type GetBooksLazyQueryHookResult = ReturnType<typeof useGetBooksLazyQuery>;
+export type GetBooksSuspenseQueryHookResult = ReturnType<typeof useGetBooksSuspenseQuery>;
+export type GetBooksQueryResult = Apollo.QueryResult<GetBooksQuery, GetBooksQueryVariables>;
 export const GetQuestionsDocument = gql`
     query GetQuestions($bookId: ID, $chapterId: ID) {
   getQuestionsForBook(bookId: $bookId, chapterId: $chapterId) {

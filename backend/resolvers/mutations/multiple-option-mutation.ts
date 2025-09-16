@@ -57,7 +57,7 @@ export const generateMCQQuestions = async (
       if (!chapter) {
         throw new Error("Chapter not found");
       }
-    }
+    } 
 
     // ---- OpenAI-гаар олон сонголттой асуулт үүсгэх ---- //
     const completion = await client.chat.completions.create({
