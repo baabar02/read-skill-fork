@@ -1,47 +1,47 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { BookOpen, Smile } from "lucide-react";
-import Link from "next/link";
-import { Dialog } from "@headlessui/react";
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { BookOpen, Smile } from 'lucide-react'
+import Link from 'next/link'
+import { Dialog } from '@headlessui/react'
 
 const activities = [
   {
     id: 1,
-    title: "Өдөр тутмын дасгал",
-    desc: "Биеийн хөдөлгөөн, энгийн үгсийг давтах хялбар дасгал.",
+    title: 'Өдөр тутмын дасгал',
+    desc: 'Биеийн хөдөлгөөн, энгийн үгсийг давтах хялбар дасгал.',
     icon: <Smile className="w-7 h-7" />,
-    color: "bg-gradient-to-br from-amber-200 to-amber-300",
+    color: 'bg-gradient-to-br from-amber-200 to-amber-300',
     details: [
-      "Биеийн хөдөлгөөнөөр хүүхдийн эрүүл мэндийг дэмжих",
-      "Энгийн үгсийг давтсанаар хэлний мэдлэг нэмэгдэх",
+      'Биеийн хөдөлгөөнөөр хүүхдийн эрүүл мэндийг дэмжих',
+      'Энгийн үгсийг давтсанаар хэлний мэдлэг нэмэгдэх',
     ],
   },
   {
     id: 2,
-    title: "Түүх сонсох",
-    desc: "Монгол үлгэр, богино түүхүүдтэй видео хичээл.",
+    title: 'Түүх сонсох',
+    desc: 'Монгол үлгэр, богино түүхүүдтэй видео хичээл.',
     icon: <BookOpen className="w-7 h-7" />,
-    color: "bg-gradient-to-br from-sky-200 to-sky-300",
+    color: 'bg-gradient-to-br from-sky-200 to-sky-300',
     details: [
-      "Монгол ардын ёс заншил, үнэт зүйлсийг ойлгох",
-      "Сонсголын чадвар, анхаарал төвлөрөлтийг сайжруулах",
+      'Монгол ардын ёс заншил, үнэт зүйлсийг ойлгох',
+      'Сонсголын чадвар, анхаарал төвлөрөлтийг сайжруулах',
     ],
   },
-];
+]
 
 const UserPage = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<
     (typeof activities)[0] | null
-  >(null);
+  >(null)
 
   const openDialog = (activityId: number) => {
-    const activity = activities.find((a) => a.id === activityId) || null;
-    setSelectedActivity(activity);
-    setDialogOpen(true);
-  };
+    const activity = activities.find((a) => a.id === activityId) || null
+    setSelectedActivity(activity)
+    setDialogOpen(true)
+  }
 
   return (
     <section className="min-h-screen flex flex-col max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-b from-pink-50 via-white to-sky-50 rounded-3xl shadow-inner">
@@ -80,7 +80,7 @@ const UserPage = () => {
             <div className="w-full bg-gray-200 rounded-full h-4 mt-2 overflow-hidden">
               <div
                 className="h-4 rounded-full bg-amber-400 transition-all duration-500"
-                style={{ width: "50%" }}
+                style={{ width: '50%' }}
               />
             </div>
           </div>
@@ -88,7 +88,7 @@ const UserPage = () => {
           <div className="flex flex-wrap gap-4 mt-4">
             <button
               className="flex-1 min-w-[120px] rounded-xl py-2 bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-700 font-medium transition-colors"
-              onClick={() => alert("Үргэлжлүүлэх логик нэмэх")}
+              onClick={() => alert('Үргэлжлүүлэх логик нэмэх')}
             >
               Үргэлжлүүлэх
             </button>
@@ -119,9 +119,11 @@ const UserPage = () => {
               "Цагаан морь" — ярилцлага, асуулт хариулттай богино түүх
             </p>
             <div className="mt-3">
-              <button className="text-sm rounded-full px-4 py-2 bg-amber-300 hover:bg-amber-400 text-white transition-colors">
-                Үзэх
-              </button>
+              <Link href="/user/assignmentsSection">
+                <button className="text-sm rounded-full px-4 py-2 bg-amber-300 hover:bg-amber-400 text-white transition-colors">
+                  Үзэх
+                </button>
+              </Link>
             </div>
           </div>
         </motion.div>
@@ -153,8 +155,8 @@ const UserPage = () => {
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link href={`/user/videoDetails/${activity.id}`}>
                     <button className="text-sm px-4 py-1.5 rounded-full bg-sky-100 hover:bg-sky-200 border text-sky-700 transition-colors">
-                      {" "}
-                      Эхлэх{" "}
+                      {' '}
+                      Эхлэх{' '}
                     </button>
                   </Link>
                   <button
@@ -203,7 +205,7 @@ const UserPage = () => {
         © {new Date().getFullYear()} Бага ангийн хүүхдэд зориулсан контент
       </footer>
     </section>
-  );
-};
+  )
+}
 
-export default UserPage;
+export default UserPage
