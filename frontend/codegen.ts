@@ -1,14 +1,8 @@
 // codegen.ts
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
-const rawSchemaUrl =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4200";
-const schemaUrl = rawSchemaUrl.endsWith("/graphql")
-  ? rawSchemaUrl
-  : `${rawSchemaUrl.replace(/\/$/, "")}/graphql`;
-
 const config: CodegenConfig = {
-  schema: schemaUrl,
+  schema: "src/graphql/schema.graphql",
   documents: "graphql/**/*.graphql",
   generates: {
     "./graphql/generated.ts": {
