@@ -144,7 +144,6 @@ export type MutationSubmitAnswerArgs = {
   chapterId?: InputMaybe<Scalars['ID']['input']>;
   questionId: Scalars['ID']['input'];
   userAnswer: Scalars['String']['input'];
-  userId: Scalars['ID']['input'];
 };
 
 export type Query = {
@@ -286,10 +285,7 @@ export type GetUsersQuery = { __typename?: 'Query', getUsers: Array<{ __typename
 
 export type SubmitAnswerMutationVariables = Exact<{
   questionId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
   userAnswer: Scalars['String']['input'];
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
@@ -670,14 +666,8 @@ export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery
 export type GetUsersSuspenseQueryHookResult = ReturnType<typeof useGetUsersSuspenseQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
 export const SubmitAnswerDocument = gql`
-    mutation SubmitAnswer($questionId: ID!, $userId: ID!, $userAnswer: String!, $bookId: ID, $chapterId: ID) {
-  submitAnswer(
-    questionId: $questionId
-    userId: $userId
-    userAnswer: $userAnswer
-    bookId: $bookId
-    chapterId: $chapterId
-  ) {
+    mutation SubmitAnswer($questionId: ID!, $userAnswer: String!) {
+  submitAnswer(questionId: $questionId, userAnswer: $userAnswer) {
     id
     questionId
     userAnswer
@@ -707,10 +697,7 @@ export type SubmitAnswerMutationFn = Apollo.MutationFunction<SubmitAnswerMutatio
  * const [submitAnswerMutation, { data, loading, error }] = useSubmitAnswerMutation({
  *   variables: {
  *      questionId: // value for 'questionId'
- *      userId: // value for 'userId'
  *      userAnswer: // value for 'userAnswer'
- *      bookId: // value for 'bookId'
- *      chapterId: // value for 'chapterId'
  *   },
  * });
  */

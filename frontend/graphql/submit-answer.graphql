@@ -1,17 +1,5 @@
-mutation SubmitAnswer(
-  $questionId: ID!
-  $userId: ID!
-  $userAnswer: String!
-  $bookId: ID
-  $chapterId: ID
-) {
-  submitAnswer(
-    questionId: $questionId
-    userId: $userId
-    userAnswer: $userAnswer
-    bookId: $bookId
-    chapterId: $chapterId
-  ) {
+mutation SubmitAnswer($questionId: ID!, $userAnswer: String!) {
+  submitAnswer(questionId: $questionId, userAnswer: $userAnswer) {
     id
     questionId
     userAnswer

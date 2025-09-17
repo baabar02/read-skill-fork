@@ -129,7 +129,6 @@ type Mutation {
   ): [Question!]!
   submitAnswer(
     questionId: ID!
-    userId: ID!
     userAnswer: String!
     bookId: ID
     chapterId: ID

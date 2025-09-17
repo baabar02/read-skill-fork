@@ -5,7 +5,7 @@ type Answer = {
   bookId: Schema.Types.ObjectId;
   chapterId?: Schema.Types.ObjectId;
   questionId: Schema.Types.ObjectId;
-  userId: Schema.Types.ObjectId;
+  userId?: string;
   answer: string;
   isCorrect: boolean;
 
@@ -18,14 +18,14 @@ type Answer = {
 
 const AnswerSchema = new Schema<Answer>(
   {
-    bookId: { type: Schema.Types.ObjectId, required: true, ref: "Book" },
+    bookId: { type: Schema.Types.ObjectId, required: false, ref: "Book" },
     chapterId: { type: Schema.Types.ObjectId, required: false, ref: "Chapter" },
     questionId: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "Question",
     },
-    userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+    userId: { type: String, required: false, ref: "User" },
     answer: { type: String, required: true },
     isCorrect: { type: Boolean, required: true },
 

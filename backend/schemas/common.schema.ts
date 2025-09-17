@@ -31,7 +31,7 @@ type Content {
 
 type Question {
   id: ID!
-  bookId: ID!
+  bookId: ID
   chapterId: ID
   question: String!
   answer: String!
@@ -45,7 +45,7 @@ type Answer {
   bookId: ID!
   chapterId: ID!
   questionId: ID!
-  userId: ID!
+  userId: String!
   answer: String!
   isCorrect: Boolean!
   createdAt: String!
@@ -117,7 +117,6 @@ type UserScore {
     ): [Question!]!
     submitAnswer(
       questionId: ID!
-      userId: ID!
       userAnswer: String!
       bookId: ID
       chapterId: ID

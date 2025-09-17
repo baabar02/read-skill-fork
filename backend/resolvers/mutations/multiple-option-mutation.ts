@@ -2,6 +2,7 @@ import { OpenAI } from "openai";
 import { Question } from "../../models/question-model";
 import { Book } from "../../models/book-model";
 import { Chapter } from "../../models/chapter-model";
+import { sanitizeJsonFromAI } from "./sanitaze-json-mutation";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -57,7 +58,7 @@ export const generateMCQQuestions = async (
       if (!chapter) {
         throw new Error("Chapter not found");
       }
-    } 
+    }
 
     // ---- OpenAI-гаар олон сонголттой асуулт үүсгэх ---- //
     const completion = await client.chat.completions.create({
@@ -98,15 +99,35 @@ export const generateMCQQuestions = async (
     if (!jsonMatch) {
       throw new Error("AI-аас буруу форматаар хариу ирсэн байна");
     }
+    // let questionsData;
+    // try {
+    //   questionsData = JSON.parse(result!);
+    // } catch (err) {
+    //   console.error("❌ JSON Parse Error:", err);
+    //   throw new Error(
+    //     "AI-аас ирсэн JSON буруу байна. Магадгүй JSON массив бүрэн биш."
+    //   );
+    // }
+    // // const result = completion.choices[0]?.message?.content;
+    // if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
 
-    const questionsData = JSON.parse(jsonMatch[0]);
+    let questionsData;
+    try {
+      const cleanJson = sanitizeJsonFromAI(result);
+      questionsData = JSON.parse(cleanJson);
+    } catch (err) {
+      console.error("❌ JSON Parse Error:", err);
+      throw new Error("AI-аас ирсэн JSON буруу байна. Засвар шаардлагатай.");
+    }
+
+    // const questionsData = JSON.parse(jsonMatch[0]);
 
     // ---- DB-д хадгалах ---- //
     const savedQuestions = [];
     for (const q of questionsData) {
       const question = new Question({
-        bookId: args.bookId || null,
-        chapterId: args.chapterId || null,
+        // bookId: args.bookId ?? "",
+        // chapterId: args.chapterId ?? "",
         question: q.question,
         answer: q.correctAnswer,
         option: {
