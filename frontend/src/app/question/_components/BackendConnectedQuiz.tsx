@@ -73,6 +73,26 @@ export default function BackendConnectedQuiz() {
   const [generateMCQQuestions, { loading: generatingQuestions }] = useMutation(
     GenerateMcqQuestionsDocument
   );
+
+  // Дуудлага хийх
+  const handleGenerate = async () => {
+    try {
+      const { data } = await generateMCQQuestions({
+        variables: {
+          content: "Жаал хүүгийн тухай өгүүллэг...",
+          bookId: "123abc",
+          chapterId: "456def",
+          difficulty: "easy",
+          numberOfQuestions: 5,
+          language: "Mongolian",
+        },
+      });
+      console.log("Хариу: ", data);
+    } catch (err) {
+      console.error("Алдаа: ", err);
+    }
+  };
+
   const [submitAnswer, { loading: submittingAnswer }] =
     useMutation(SubmitAnswerDocument);
 
@@ -102,6 +122,7 @@ export default function BackendConnectedQuiz() {
         setSubmittedAnswers({});
         setShowResults(false);
       }
+      console.log(result.data?.generateMCQQuestions, "generatedMCQ");
     } catch (error) {
       console.error("Error generating questions:", error);
       alert("Failed to generate questions. Please try again.");

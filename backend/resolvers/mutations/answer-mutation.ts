@@ -6,7 +6,7 @@ export const submitAnswer = async (
   _: unknown,
   args: {
     questionId: string;
-    userId: string;
+    userId?: string;
     userAnswer: string;
     bookId?: string;
     chapterId?: string;
@@ -25,10 +25,10 @@ export const submitAnswer = async (
 
     // Create answer record
     const answer = new Answer({
-      bookId: args.bookId || question.bookId,
-      chapterId: args.chapterId || question.chapterId,
+      // bookId: args.bookId || question.bookId,
+      // chapterId: args.chapterId || question.chapterId,
       questionId: args.questionId,
-      userId: args.userId,
+      // userId: args.userId ?? "",
       answer: args.userAnswer,
       isCorrect: isCorrect,
     });
