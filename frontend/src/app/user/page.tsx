@@ -11,10 +11,10 @@ const UserPage = () => {
       className="min-h-screen flex flex-col bg-cover bg-center"
       style={{ backgroundImage: "url('/user-bg.jpg')" }}
     >
-      <div className="fixed top-0 left-0 w-full z-50">
+      <div className="fixed top-0 left-0 w-full z-50 ">
         <Header />
       </div>
-      <div className="flex-1 pt-20 px-6">
+      <div className="flex-1 pt-20 sm:pt-50 px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <HomeWork />
           <LevelUpGame />
