@@ -31,9 +31,9 @@ type ConfettiParticle = {
 }
 
 const STORIES_BY_GRADE: { [grade: number]: Story[] } = {
-  3: STORIES_3,
-  4: STORIES_4,
-  5: STORIES_5,
+  3: STORIES_3 as Story[],
+  4: STORIES_4 as Story[],
+  5: STORIES_5 as Story[],
 }
 
 const generateConfetti = (): ConfettiParticle[] =>
@@ -47,7 +47,7 @@ const generateConfetti = (): ConfettiParticle[] =>
     rotate: Math.random() * 360,
   }))
 
-export default function StoryGame() {
+const StoryGame = () => {
   const [grade, setGrade] = useState<number | null>(null)
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0)
   const [reading, setReading] = useState(true)
@@ -77,7 +77,15 @@ export default function StoryGame() {
 
   if (grade === null) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-yellow-100 to-pink-100 p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-yellow-100 to-pink-100 p-4 relative">
+        <button
+          className="mt-6 px-6 py-3 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform"
+          onClick={() => {
+            window.history.back()
+          }}
+        >
+          ← Буцах
+        </button>
         <h1 className="text-3xl font-extrabold text-orange-600 drop-shadow-md text-center">
           Хүүхдийн ангиа сонгоно уу
         </h1>
@@ -104,7 +112,6 @@ export default function StoryGame() {
   const currentStory = stories[currentStoryIndex]
   const q = currentStory.questions[currentQuestionIndex]
 
-  // Bubble coordinates responsive
   const LEVEL_POSITIONS = currentStory.questions.map((_, i) => ({
     x: 20 + ((screenWidth - 40) / currentStory.questions.length) * i,
     y: isMobile ? 100 + i * 50 : 120 + i * 60,
@@ -149,24 +156,55 @@ export default function StoryGame() {
 
   if (completed)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-b from-pink-100 to-yellow-100 p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-b from-pink-100 to-yellow-100 p-4 relative">
         <h1 className="text-3xl font-extrabold text-orange-600 drop-shadow-lg">
           🎉 Бүх үлгэрийн бүх level дууслаа! 🎉
         </h1>
         <p className="text-xl font-semibold mt-4">Таны нийт оноо: {score}</p>
+        <button
+          className="mt-6 px-6 py-3 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform"
+          onClick={() => {
+            setGrade(null)
+            setCurrentStoryIndex(0)
+            setCurrentQuestionIndex(0)
+            setScorePerLevel([])
+            setCompletedLevels([])
+            setScore(0)
+            setCompleted(false)
+          }}
+        >
+          ← Буцах
+        </button>
       </div>
     )
 
   return (
     <div className="p-4 min-h-screen bg-gradient-to-b from-yellow-100 to-pink-50 relative overflow-hidden">
-      {/* Score */}
       <div className="fixed top-4 right-4 font-bold text-lg bg-white/80 px-3 py-1 rounded-xl shadow z-50">
         Оноо: {score}
       </div>
 
-      {/* Story title and content */}
+      <button
+        className="absolute top-4 left-4 px-4 py-2 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform z-50"
+        onClick={() => {
+          if (!reading) {
+            setReading(true)
+          } else {
+            setGrade(null)
+            setCurrentStoryIndex(0)
+            setCurrentQuestionIndex(0)
+            setScorePerLevel([])
+            setCompletedLevels([])
+            setScore(0)
+            setCompleted(false)
+          }
+        }}
+      >
+        ← Буцах
+      </button>
+
       {reading && (
-        <div className="bg-white p-6 rounded-3xl shadow-xl text-lg mb-6 z-40 relative">
+        <div className="bg-white p-6 rounded-3xl shadow-xl text-lg mb-6 z-40 relative top-10">
           <h2 className="text-xl font-bold mb-3 text-orange-600">
             {currentStory.title}
           </h2>
@@ -180,9 +218,9 @@ export default function StoryGame() {
         </div>
       )}
 
+      {/* Questions, rabbit, path, confetti */}
       {!reading && (
         <>
-          {/* Path */}
           <svg className="absolute w-full h-full top-0 left-0 pointer-events-none z-10">
             <path
               d={`M${LEVEL_POSITIONS.map((p) => `${p.x},${p.y}`).join(' C')}`}
@@ -193,20 +231,18 @@ export default function StoryGame() {
             />
           </svg>
 
-          {/* Rabbit */}
           <motion.div
-            className="w-16 h-16 rounded-full bg-pink-400 flex items-center justify-center text-white font-bold shadow-2xl absolute z-20"
-            animate={{ x: currentPos.x, y: currentPos.y }}
+            className="w-10 h-10 rounded-full  flex items-center justify-center text-white font-bold text-2xl shadow-2xl absolute z-30"
+            animate={{ x: currentPos.x - 12, y: currentPos.y }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
             🐰
           </motion.div>
 
-          {/* Levels */}
           {LEVEL_POSITIONS.map((pos, idx) => (
             <div
               key={idx}
-              className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full border-4 flex items-center justify-center font-bold cursor-pointer shadow-lg text-lg z-20
+              className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full border-4 flex items-center justify-center font-bold cursor-pointer shadow-lg text-lg z-20 overflow-auto
                 ${
                   completedLevels.includes(idx)
                     ? 'bg-green-400 text-white border-green-500'
@@ -224,7 +260,6 @@ export default function StoryGame() {
             </div>
           ))}
 
-          {/* Question box */}
           <AnimatePresence mode="wait">
             {q && (
               <motion.div
@@ -254,7 +289,6 @@ export default function StoryGame() {
             )}
           </AnimatePresence>
 
-          {/* Confetti */}
           <AnimatePresence>
             {showConfetti &&
               confettiParticles.map((c, i) => (
@@ -307,3 +341,5 @@ export default function StoryGame() {
     </div>
   )
 }
+
+export default StoryGame

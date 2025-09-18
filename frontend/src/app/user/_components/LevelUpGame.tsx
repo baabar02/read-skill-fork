@@ -1,12 +1,13 @@
-"use client";
+'use client'
 
-import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React from 'react'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 const LevelUpGame = () => {
-  const level = 1;
-  const heroName = "Уншдаг Баатар";
+  const level = 1
+  const heroName = 'Уншдаг Баатар'
 
   return (
     <Card className="w-full max-w-xl h-[32rem] mx-auto bg-white/40 backdrop-blur-md border border-gray-200 shadow-lg flex flex-col justify-between p-6">
@@ -23,12 +24,14 @@ const LevelUpGame = () => {
         </p>
       </CardContent>
       <div className="mt-4 w-full">
-        <Button size="lg" variant="default" className="w-full">
-          Тоголцгооё
-        </Button>
+        <Link href="/storyGame">
+          <Button size="lg" variant="default" className="w-full">
+            Тоголцгооё
+          </Button>
+        </Link>
       </div>
     </Card>
-  );
-};
+  )
+}
 
-export default LevelUpGame;
+export default LevelUpGame
