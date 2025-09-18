@@ -1,0 +1,18 @@
+mutation UserProgress(
+  $questionId: ID!
+  $answer: String!
+  $timeDuration: Int!
+  $userId: ID
+) {
+  userProgress(
+    questionId: $questionId
+    answer: $answer
+    timeDuration: $timeDuration
+    userId: $userId
+  ) {
+    success
+    isCorrect
+    score
+    explanation
+  }
+}

@@ -1,0 +1,13 @@
+query GetUserProgress($userId: ID!) {
+  getUserProgress(userId: $userId) {
+    questionId
+    answer
+    isCorrect
+    timeDuration
+    userName
+    completed
+    explanation
+    score
+    success
+  }
+}

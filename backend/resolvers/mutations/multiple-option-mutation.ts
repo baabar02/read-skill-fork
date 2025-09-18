@@ -28,7 +28,6 @@ export const generateMCQQuestions = async (
       throw new Error("OpenAI API key is not configured");
     }
 
-    // ---- Агуулга ачаалж авах ---- //
     let contentToUse = args.content?.trim();
 
     if (!contentToUse) {
@@ -49,10 +48,9 @@ export const generateMCQQuestions = async (
         throw new Error("Номын контент олдсонгүй");
       }
 
-      contentToUse = book.content.join("\n"); // массив байвал нэгтгэх
+      contentToUse = book.content.join("\n");
     }
 
-    // ---- chapterId шалгах (хэрвээ өгөгдсөн бол) ---- //
     if (args.chapterId) {
       const chapter = await Chapter.findById(args.chapterId);
       if (!chapter) {
@@ -92,37 +90,38 @@ export const generateMCQQuestions = async (
     });
 
     const result = completion.choices[0]?.message?.content;
+    console.log("AI-ийн хариу: ", result);
+
     if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
     console.log(result);
-    // ---- JSON parse хийх ---- //
+
     const jsonMatch = result.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       throw new Error("AI-аас буруу форматаар хариу ирсэн байна");
     }
-    // let questionsData;
-    // try {
-    //   questionsData = JSON.parse(result!);
-    // } catch (err) {
-    //   console.error("❌ JSON Parse Error:", err);
-    //   throw new Error(
-    //     "AI-аас ирсэн JSON буруу байна. Магадгүй JSON массив бүрэн биш."
-    //   );
-    // }
-    // // const result = completion.choices[0]?.message?.content;
-    // if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
-
     let questionsData;
     try {
-      const cleanJson = sanitizeJsonFromAI(result);
-      questionsData = JSON.parse(cleanJson);
+      questionsData = JSON.parse(result!);
     } catch (err) {
       console.error("❌ JSON Parse Error:", err);
-      throw new Error("AI-аас ирсэн JSON буруу байна. Засвар шаардлагатай.");
+      throw new Error(
+        "AI-аас ирсэн JSON буруу байна. Магадгүй JSON массив бүрэн биш."
+      );
     }
+    // const result = completion.choices[0]?.message?.content;
+    if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
+
+    // let questionsData;
+    // try {
+    //   const cleanJson = sanitizeJsonFromAI(result);
+    //   questionsData = JSON.parse(cleanJson);
+    // } catch (err) {
+    //   console.error("❌ JSON Parse Error:", err);
+    //   throw new Error("AI-аас ирсэн JSON буруу байна. Засвар шаардлагатай.");
+    // }
 
     // const questionsData = JSON.parse(jsonMatch[0]);
 
-    // ---- DB-д хадгалах ---- //
     const savedQuestions = [];
     for (const q of questionsData) {
       const question = new Question({

@@ -16,6 +16,7 @@ type Score = {
   totalScore: number;
   totalPercentage: number;
   isCorrect: Boolean;
+  
 };
 
 const ScoreSchema = new Schema<Score>(
