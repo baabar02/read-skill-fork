@@ -2,10 +2,5 @@ query GetUsers {
   getUsers {
     id
     name
-    email
   }
 }
-
-
-
-

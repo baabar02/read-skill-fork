@@ -10,6 +10,7 @@ export const resolvers = {
     generateQuestionsWithContent: Mutation.generateQuestionsWithContent,
     generateMCQQuestions: Mutation.generateMCQQuestions,
     submitAnswer: Mutation.submitAnswer,
+    userProgress: Mutation.userProgress,
   },
   Query: {
     getUsers: Query.getUsers,
@@ -18,6 +19,7 @@ export const resolvers = {
     getUserScore: Query.getUserScore,
     getBookById: Query.getBookById,
     getBooks: Query.getBooks,
+    getUserProgress: Query.getUserProgress,
   },
   Question: {
     option: (parent: any) => {

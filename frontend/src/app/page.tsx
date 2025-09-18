@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useGetUsersQuery } from "../../graphql/generated";
+import CreateUserForm from "./login/_components/user-form";
 
 const Home = () => {
   const { data } = useGetUsersQuery();
@@ -10,7 +11,7 @@ const Home = () => {
 
   return (
     <div className="">
-      <Button variant="outline">Add</Button>
+      <Button variant="outline">Addd</Button>
     </div>
   );
 };

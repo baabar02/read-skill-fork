@@ -1,6 +1,5 @@
 import { Answer } from "../../models/answer-model";
 
-// Get user's answers for a book/chapter
 export const getUserAnswers = async (
   _: unknown,
   args: {

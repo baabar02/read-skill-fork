@@ -1,7 +1,6 @@
 type User {
   id: ID!
   name: String!
-  email: String!
 }
 
 type Book {
@@ -84,7 +83,25 @@ type UserScore {
   score: Int!
   percentage: Int!
 }
-
+type UserProgress {
+  questionId: ID!
+  question: String!
+  answer: String!
+  isCorrect: Boolean!
+  timeDuration: Int
+  userName: String
+  completed: Boolean
+  score: Int
+  explanation: String
+  success: Boolean
+}
+type UserProgressResult {
+  success: Boolean
+  isCorrect: Boolean
+  score: Int
+  explanation: String
+  userName: String
+}
 type Query {
   getUsers: [User!]!
   getQuestionsForBook(bookId: ID, chapterId: ID): [Question!]!
@@ -92,10 +109,18 @@ type Query {
   getUserScore(userId: ID!, bookId: ID, chapterId: ID): UserScore!
   getBooks: [Book!]!
   getBookById(bookId: ID!): Book!
+  getUserProgress(userId: ID!): [UserProgress!]!
 }
 
 type Mutation {
-  createUser(name: String!, email: String!): User!
+  userProgress(
+    questionId: ID!
+    answer: String!
+    timeDuration: Int!
+    userId: ID
+  ): UserProgressResult
+
+  createUser(name: String!, email: String): User!
   addBook(
     title: String!
     chapters: Int
