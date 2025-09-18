@@ -1,131 +1,160 @@
-'use client'
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
+"use client";
 
-import { Save, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import ProfileHeader from './_components/ProfileHeader'
-import ProfileDetails from './_components/ProfileDetails'
-import ProgressChart from './_components/ProgressChart'
-import { nowFormatted } from './_components/utils'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Camera } from "lucide-react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-const initialHistory = [40, 55, 50, 60, 45, 70, 50]
+const Page = () => {
+  const router = useRouter();
 
-export default function ProfileEditor() {
   const [profile, setProfile] = useState({
-    id: 'user_001',
-    image: '',
-    name: 'Анхаа',
-    age: 8,
-    gender: 'Хүү',
-    progress: 50,
-    progressHistory: initialHistory,
-    lastSaved: new Date(),
-  })
+    name: "Төгөлдөр",
+    age: 25,
+    gender: "Хүү",
+    image: "",
+  });
 
-  const [draft, setDraft] = useState({ ...profile })
-  const [isEditing, setIsEditing] = useState(false)
-  const [responseMessage, setResponseMessage] = useState('')
+  const [editMode, setEditMode] = useState(false);
 
-  const handleEdit = () => {
-    setDraft({ ...profile })
-    setIsEditing(true)
-    setResponseMessage('')
-  }
-
-  const handleCancel = () => {
-    setDraft({ ...profile })
-    setIsEditing(false)
-    setResponseMessage('Засвар буцаагдлаа.')
-    setTimeout(() => setResponseMessage(''), 2500)
-  }
-
-  const handleSave = () => {
-    const newHistory = [...draft.progressHistory]
-    newHistory[newHistory.length - 1] = draft.progress
-    const updated = {
-      ...draft,
-      progressHistory: newHistory,
-      lastSaved: new Date(),
-    }
-    setProfile(updated)
-    setIsEditing(false)
-    setResponseMessage(
-      `Профайл хадгалагдлаа — ${nowFormatted(updated.lastSaved)}`
-    )
-    setTimeout(() => setResponseMessage(''), 5000)
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const url = URL.createObjectURL(file)
-      setDraft((d) => ({ ...d, image: url }))
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProfile((prev) => ({ ...prev, image: event.target?.result as string }));
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
-  const updateDraft = (patch: Partial<typeof draft>) =>
-    setDraft((d) => ({ ...d, ...patch }))
+  const handleSave = () => {
+    setEditMode(false);
+    console.log("Saved profile:", profile);
+  };
 
   return (
-    <section className="relative min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-pink-100 via-amber-50 to-sky-100 overflow-hidden py-3">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="z-10 w-full max-w-3xl px-4 sm:px-6"
-      >
-        <Card className="rounded-3xl shadow-2xl bg-white/90 backdrop-blur-md overflow-hidden">
-          <ProfileHeader
-            profile={profile}
-            draft={draft}
-            isEditing={isEditing}
-            responseMessage={responseMessage}
-            onEdit={handleEdit}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            onImageChange={handleImageChange}
-            updateDraft={updateDraft}
-          />
-          <CardContent className="px-4 sm:px-8 pt-4 pb-2">
-            <ProfileDetails
-              profile={profile}
-              draft={draft}
-              isEditing={isEditing}
-              updateDraft={updateDraft}
-            />
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                7 хоногийн гүйцэтгэл
-              </h3>
-              <ProgressChart
-                history={
-                  isEditing ? draft.progressHistory : profile.progressHistory
-                }
-              />
+    <div className="relative min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      
+      <img
+        src="/user-bg.jpg"
+        alt="Background"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      <Card className="relative w-full max-w-sm p-6 z-10 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl shadow-lg">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 left-4"
+          onClick={() => router.push("/user")}
+        >
+          <ArrowLeft className="w-6 h-6 text-black" />
+        </Button>
+
+        <CardContent className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-32 h-32 rounded-full bg-gray-300 flex items-center justify-center text-3xl font-bold text-black overflow-hidden">
+              {profile.image ? (
+                <img src={profile.image} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                profile.name.charAt(0)
+              )}
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-3 items-center py-6">
-            {isEditing && (
-              <div className="w-full md:w-1/2 flex gap-3 flex-wrap">
-                <Button
-                  onClick={handleSave}
-                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6 py-2"
-                >
-                  <Save className="w-4 h-4 mr-2" /> Save
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="flex-1"
-                >
-                  <X className="w-4 h-4 mr-2" /> Cancel
-                </Button>
-              </div>
+
+            {editMode && (
+              <label className="absolute bottom-0 right-0 cursor-pointer flex items-center justify-center w-10 h-10 bg-black text-white rounded-full hover:bg-gray-800">
+                <Camera className="w-5 h-5" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </label>
             )}
-          </CardFooter>
-        </Card>
-      </motion.div>
-    </section>
-  )
-}
+          </div>
+
+          <div className="w-full">
+            <label className="block text-black mb-1">Нэр</label>
+            {editMode ? (
+              <Input
+                name="name"
+                value={profile.name}
+                onChange={handleChange}
+                placeholder="Нэр оруулна уу"
+                className="bg-white/50 text-black"
+              />
+            ) : (
+              <p className="text-lg font-semibold text-black">{profile.name}</p>
+            )}
+          </div>
+          <div className="w-full">
+            <label className="block text-black mb-1">Нас</label>
+            {editMode ? (
+              <Input
+                type="number"
+                name="age"
+                value={profile.age}
+                onChange={handleChange}
+                placeholder="Нас оруулна уу"
+                className="bg-white/50 text-black"
+              />
+            ) : (
+              <p className="text-black">{profile.age}</p>
+            )}
+          </div>
+          <div className="w-full">
+            <label className="block text-black mb-1">Хүйс</label>
+            {editMode ? (
+              <div className="flex gap-4 mt-1">
+                <label className="flex items-center gap-2 text-black">
+                  <Input
+                    type="radio"
+                    name="gender"
+                    value="Хүү"
+                    checked={profile.gender === "Хүү"}
+                    onChange={handleChange}
+                  />
+                  Хүү
+                </label>
+                <label className="flex items-center gap-2 text-black">
+                  <Input
+                    type="radio"
+                    name="gender"
+                    value="Охин"
+                    checked={profile.gender === "Охин"}
+                    onChange={handleChange}
+                  />
+                  Охин
+                </label>
+              </div>
+            ) : (
+              <p className="text-black">{profile.gender}</p>
+            )}
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-2">
+          {editMode ? (
+            <Button onClick={handleSave} variant="default">
+              Хадгалах
+            </Button>
+          ) : (
+            <Button onClick={() => setEditMode(true)} variant="default">
+              Засах
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
+
+export default Page;
+
