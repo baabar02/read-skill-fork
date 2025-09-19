@@ -15,6 +15,7 @@ export const resolvers = {
     updateBook: Mutation.updateBook,
     deleteBook: Mutation.deleteBook,
     createQuestion: Mutation.createQuestion
+    transcribeAudio: Mutation.transcribeAudio,
   },
   Query: {
     getUsers: Query.getUsers,
@@ -26,7 +27,11 @@ export const resolvers = {
     getBooks: Query.getBooks,
     getUserProgress: Query.getUserProgress,
     getUserById: Query.getUserById,
+    getTranscriptions: Query.getTranscriptions,
+    getTranscription: Query.getTranscription,
   },
+
+  
   Question: {
     option: (parent: any) => {
       if (parent.option && typeof parent.option === "string") {

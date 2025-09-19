@@ -102,6 +102,18 @@ type UserScore {
   score: Int!
   percentage: Int!
 }
+ type Transcription {
+  id: ID!
+  text: String!
+  userId: ID!
+  bookId: ID!
+  isCorrect: Boolean!
+  score: Int!
+  createdAt: String!
+  wordCount: Int!
+  duration: Int
+}
+
 
   input QuestionOptionsInput {
   options: [String!]!
@@ -121,6 +133,9 @@ type UserScore {
     getUserById(userId:ID!) : User!
   questions: [Question!]!
   question(id: ID!): Question
+
+    getTranscriptions(userId: ID!): [Transcription]!
+    getTranscription(id: ID!): Transcription
   }
 
  type UserProgressResponse {
@@ -153,6 +168,7 @@ type UserScore {
 
     userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!, timeAnswer:Int!):UserProgressResponse
     loginUser(name: String!): AuthPayload!
+<<<<<<< HEAD
    deleteBook(bookId: ID!): DeleteResponse!
     updateBook(  bookId: ID!, title: String, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]) : Book!
      createQuestion(
@@ -164,6 +180,30 @@ type UserScore {
     createdBy: ID!
     assignedTo: ID
   ):Question!
+=======
+    generateQuestionsWithContent(
+      content: String!
+      bookId: ID
+      chapterId: ID
+      difficulty: String
+      numberOfQuestions: Int
+    ): GeneratedQuestions!
+    generateMCQQuestions(
+      content: String!
+      bookId: ID
+      chapterId: ID
+      difficulty: String
+      numberOfQuestions: Int
+      language: String
+    ): [Question!]!
+    submitAnswer(
+      questionId: ID!
+      userAnswer: String!
+      bookId: ID
+      chapterId: ID
+    ): AnswerResult!
+     transcribeAudio(userId: ID!, bookId: ID!, audioBase64: String!): Transcription!
+>>>>>>> cc17bb1 (audio)
   }
 
 
