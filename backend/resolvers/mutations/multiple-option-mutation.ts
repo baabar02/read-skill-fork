@@ -60,27 +60,31 @@ export const generateMCQQuestions = async (
 
     // ---- OpenAI-гаар олон сонголттой асуулт үүсгэх ---- //
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: `Чи сургалтын туслах. Хэрэглэгчийн өгсөн текст дээр үндэслэж ${
+          content: `You are an assistant for creating multiple choice questions (MCQs). Based on the user's content, generate ${
             args.numberOfQuestions || 5
-          } олон сонголттой асуулт зохио. 
-          
-          Хэмжээ: ${args.difficulty || "medium"}
-          Хэл: ${args.language || "Mongolian"}
-          
-          Асуулт бүрт дараах зүйлсийг оруулна уу:
-          1. Асуулт
-          2. 4 сонголт (A, B, C, D)
-          3. Зөв хариулт (A, B, C, эсвэл D)
-          4. Тайлбар (яагаад энэ хариулт зөв болохыг тайлбарлана)
-          
-          Object форматаар хариулна уу:
-          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]
-         ONLY respond with valid JSON array, no explanations, no markdown, no extra text, no trailing commas, and use double quotes.
-`,
+          } MCQs. Return ONLY a valid JSON array.
+
+Each question object must have the following keys:
+- "question": string
+- "options": array of exactly 4 strings (choices A, B, C, D)
+- "correctAnswer": one of "A", "B", "C", or "D"
+- "explanation": string explaining why the correct answer is right
+
+Return the response as a pure JSON array. NO markdown, no text before or after. Use double quotes only.
+
+Example:
+[
+  {
+    "question": "What is 2 + 2?",
+    "options": ["1", "2", "3", "4"],
+    "correctAnswer": "D",
+    "explanation": "2 + 2 = 4, which is option D"
+  }
+]`,
         },
         {
           role: "user",

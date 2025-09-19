@@ -63,6 +63,7 @@ export default function AuthForm() {
 
     try {
       const { data } = await login({ variables: { name } });
+      // console.log("Frontend нэр:", name);
       if (!data?.loginUser?.user) {
         setErrorMessage("Нэвтрэхэд алдаа гарлаа.");
         return;
@@ -76,7 +77,7 @@ export default function AuthForm() {
       setSuccessMessage(`Амжилттай нэвтэрлээ: ${data.loginUser.user.name}`);
       setName("");
       router.push("/question");
-      console.log(setUser, "setUser");
+      // console.log(setUser, "setUser");
     } catch (error: any) {
       setErrorMessage(error.message || "Нэвтрэхэд алдаа гарлаа.");
     }
