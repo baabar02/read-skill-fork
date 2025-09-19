@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import STORIES_3 from './stories_3.json'
@@ -36,6 +36,20 @@ const STORIES_BY_GRADE: { [grade: number]: Story[] } = {
   5: STORIES_5 as Story[],
 }
 
+// Level positions
+const LEVEL_POSITIONS = [
+  { x: 40, y: 500 },
+  { x: 120, y: 420 },
+  { x: 200, y: 370 },
+  { x: 280, y: 300 },
+  { x: 360, y: 240 },
+  { x: 280, y: 180 },
+  { x: 200, y: 130 },
+  { x: 320, y: 80 },
+  { x: 240, y: 40 },
+  { x: 120, y: 10 },
+]
+
 const generateConfetti = (): ConfettiParticle[] =>
   Array.from({ length: 40 }).map(() => ({
     x: Math.random() * window.innerWidth,
@@ -61,28 +75,49 @@ const StoryGame = () => {
   const [shake, setShake] = useState(false)
   const [score, setScore] = useState(0)
   const [completed, setCompleted] = useState(false)
-  const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth)
-  const [screenHeight, setScreenHeight] = useState<number>(window.innerHeight)
 
-  useEffect(() => {
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth)
-      setScreenHeight(window.innerHeight)
+  const handleAnswer = (opt: string, q: Question, stories: Story[]) => {
+    if (opt === q.answer) {
+      setConfettiParticles(generateConfetti())
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 1500)
+      setScore((prev) => prev + 1)
+      const newScorePerLevel = [...scorePerLevel]
+      newScorePerLevel[currentQuestionIndex] = 1
+      setScorePerLevel(newScorePerLevel)
+      if (!completedLevels.includes(currentQuestionIndex))
+        setCompletedLevels((prev) => [...prev, currentQuestionIndex])
+
+      if (
+        currentQuestionIndex + 1 <
+        stories[currentStoryIndex].questions.length
+      ) {
+        setCurrentQuestionIndex((prev) => prev + 1)
+      } else {
+        if (currentStoryIndex + 1 < stories.length) {
+          setCurrentStoryIndex((prev) => prev + 1)
+          setCurrentQuestionIndex(0)
+          setReading(true)
+          setCompletedLevels([])
+          setScorePerLevel(
+            Array(stories[currentStoryIndex + 1].questions.length).fill(0)
+          )
+        } else {
+          setCompleted(true)
+        }
+      }
+    } else {
+      setShake(true)
+      setTimeout(() => setShake(false), 500)
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  const isMobile = screenWidth < 768
+  }
 
   if (grade === null) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-yellow-100 to-pink-100 p-4 relative">
         <button
           className="mt-6 px-6 py-3 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform"
-          onClick={() => {
-            window.history.back()
-          }}
+          onClick={() => window.history.back()}
         >
           ← Буцах
         </button>
@@ -112,48 +147,6 @@ const StoryGame = () => {
   const currentStory = stories[currentStoryIndex]
   const q = currentStory.questions[currentQuestionIndex]
 
-  const LEVEL_POSITIONS = currentStory.questions.map((_, i) => ({
-    x: 20 + ((screenWidth - 40) / currentStory.questions.length) * i,
-    y: isMobile ? 100 + i * 50 : 120 + i * 60,
-  }))
-
-  const currentPos = LEVEL_POSITIONS[currentQuestionIndex] || { x: 0, y: 0 }
-  const QUESTION_TOP = isMobile ? '70%' : '65%'
-
-  const handleAnswer = (opt: string) => {
-    if (!q) return
-    if (opt === q.answer) {
-      setConfettiParticles(generateConfetti())
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 1500)
-      setScore((prev) => prev + 1)
-      const newScorePerLevel = [...scorePerLevel]
-      newScorePerLevel[currentQuestionIndex] = 1
-      setScorePerLevel(newScorePerLevel)
-      if (!completedLevels.includes(currentQuestionIndex))
-        setCompletedLevels((prev) => [...prev, currentQuestionIndex])
-
-      if (currentQuestionIndex + 1 < currentStory.questions.length) {
-        setCurrentQuestionIndex((prev) => prev + 1)
-      } else {
-        if (currentStoryIndex + 1 < stories.length) {
-          setCurrentStoryIndex((prev) => prev + 1)
-          setCurrentQuestionIndex(0)
-          setReading(true)
-          setCompletedLevels([])
-          setScorePerLevel(
-            Array(stories[currentStoryIndex + 1].questions.length).fill(0)
-          )
-        } else {
-          setCompleted(true)
-        }
-      }
-    } else {
-      setShake(true)
-      setTimeout(() => setShake(false), 500)
-    }
-  }
-
   if (completed)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-b from-pink-100 to-yellow-100 p-4 relative">
@@ -179,7 +172,7 @@ const StoryGame = () => {
     )
 
   return (
-    <div className="p-4 min-h-screen bg-gradient-to-b from-yellow-100 to-pink-50 relative overflow-hidden">
+    <div className="relative min-h-screen p-4 bg-gradient-to-b from-yellow-100 to-pink-50 overflow-hidden">
       <div className="fixed top-4 right-4 font-bold text-lg bg-white/80 px-3 py-1 rounded-xl shadow z-50">
         Оноо: {score}
       </div>
@@ -187,9 +180,8 @@ const StoryGame = () => {
       <button
         className="absolute top-4 left-4 px-4 py-2 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform z-50"
         onClick={() => {
-          if (!reading) {
-            setReading(true)
-          } else {
+          if (!reading) setReading(true)
+          else {
             setGrade(null)
             setCurrentStoryIndex(0)
             setCurrentQuestionIndex(0)
@@ -203,6 +195,18 @@ const StoryGame = () => {
         ← Буцах
       </button>
 
+      {/* Decorative elements (hidden during reading) */}
+      {!reading && (
+        <div className="absolute w-full h-full top-0 left-0 md:mx-[30%] z-0">
+          <div className="absolute bg-green-300 rounded-full w-72 h-36 left-16 top-64 transform rotate-[-20deg]" />
+          <div className="absolute bg-green-400 rounded-full w-96 h-48 left-60 top-32 transform rotate-[-10deg]" />
+          <div className="absolute bg-blue-400 rounded-full w-48 h-12 left-20 top-130 opacity-70" />
+          <div className="absolute bg-gray-500 rounded-full w-12 h-12 left-72 top-180" />
+          <div className="absolute bg-gray-600 rounded-full w-8 h-8 left-40 top-100" />
+        </div>
+      )}
+
+      {/* Story reading */}
       {reading && (
         <div className="bg-white p-6 rounded-3xl shadow-xl text-lg mb-6 z-40 relative top-10">
           <h2 className="text-xl font-bold mb-3 text-orange-600">
@@ -218,103 +222,107 @@ const StoryGame = () => {
         </div>
       )}
 
-      {/* Questions, rabbit, path, confetti */}
       {!reading && (
-        <>
-          <svg className="absolute w-full h-full top-0 left-0 pointer-events-none z-10">
-            <path
-              d={`M${LEVEL_POSITIONS.map((p) => `${p.x},${p.y}`).join(' C')}`}
-              stroke="#F59E0B"
-              strokeWidth={5}
-              fill="none"
-              strokeDasharray="6"
-            />
-          </svg>
+        <svg
+          className="absolute top-0 left-0 w-full h-full z-10 -ml-5 md:mx-[30%] pointer-events-none"
+          viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <polyline
+            points={LEVEL_POSITIONS.map((p) => `${p.x + 24},${p.y + 24}`).join(
+              ' '
+            )}
+            fill="none"
+            stroke="#F59E0B"
+            strokeWidth="5"
+            strokeDasharray="6"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
 
+      {!reading && (
+        <motion.div
+          className="w-10 h-10 flex items-center justify-center -ml-5 md:mx-[30%] text-2xl absolute z-30"
+          animate={{
+            left: LEVEL_POSITIONS[currentQuestionIndex].x,
+            top: LEVEL_POSITIONS[currentQuestionIndex].y,
+          }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        >
+          🐰
+        </motion.div>
+      )}
+
+      {!reading &&
+        LEVEL_POSITIONS.map((pos, idx) => (
+          <div
+            key={idx}
+            className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full -ml-5 md:mx-[30%] border-4 flex items-center justify-center font-bold cursor-pointer shadow-lg text-lg z-20
+              ${
+                completedLevels.includes(idx)
+                  ? 'bg-green-400 text-white border-green-500'
+                  : 'bg-white border-orange-400'
+              }`}
+            style={{ left: pos.x, top: pos.y }}
+            onClick={() => setCurrentQuestionIndex(idx)}
+          >
+            {idx + 1}
+          </div>
+        ))}
+
+      <AnimatePresence mode="wait">
+        {q && !reading && (
           <motion.div
-            className="w-10 h-10 rounded-full  flex items-center justify-center text-white font-bold text-2xl shadow-2xl absolute z-30"
-            animate={{ x: currentPos.x - 12, y: currentPos.y }}
+            key={q.id}
+            className={`p-5 bg-white rounded-3xl shadow-2xl w-[90%] max-w-md text-center absolute left-1/2 -translate-x-1/2 bottom-10 z-40 ${
+              shake ? 'animate-shake' : ''
+            }`}
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            🐰
-          </motion.div>
-
-          {LEVEL_POSITIONS.map((pos, idx) => (
-            <div
-              key={idx}
-              className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full border-4 flex items-center justify-center font-bold cursor-pointer shadow-lg text-lg z-20 overflow-auto
-                ${
-                  completedLevels.includes(idx)
-                    ? 'bg-green-400 text-white border-green-500'
-                    : 'bg-white border-orange-400'
-                }`}
-              style={{ left: pos.x, top: pos.y }}
-              onClick={() => setCurrentQuestionIndex(idx)}
-            >
-              {idx + 1}
-              <div className="absolute -bottom-5 flex gap-1">
-                {Array.from({ length: scorePerLevel[idx] }).map((_, i) => (
-                  <div key={i} className="w-3 h-3 bg-yellow-400 rounded-full" />
-                ))}
-              </div>
-            </div>
-          ))}
-
-          <AnimatePresence mode="wait">
-            {q && (
-              <motion.div
-                key={q.id}
-                style={{ top: QUESTION_TOP }}
-                className={`p-5 bg-white rounded-3xl shadow-2xl w-[90%] max-w-md text-center absolute left-1/2 -translate-x-1/2 z-40 overflow-auto max-h-[35vh] md:max-h-[40vh] ${
-                  shake ? 'animate-shake' : ''
-                }`}
-                initial={{ y: -100, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -100, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              >
-                <p className="text-lg font-bold mb-4">{q.question}</p>
-                <div className="flex flex-wrap justify-center gap-3">
-                  {q.options.map((o) => (
-                    <button
-                      key={o}
-                      className="px-5 py-3 bg-gradient-to-r from-pink-400 to-pink-500 text-white rounded-2xl shadow hover:scale-105 transition-transform font-bold"
-                      onClick={() => handleAnswer(o)}
-                    >
-                      {o}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {showConfetti &&
-              confettiParticles.map((c, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute rounded-full"
-                  style={{
-                    left: c.x,
-                    top: c.y,
-                    width: c.size,
-                    height: c.size,
-                    backgroundColor: c.color,
-                  }}
-                  initial={{ y: c.y, rotate: c.rotate, opacity: 1 }}
-                  animate={{
-                    y: screenHeight + 50,
-                    rotate: c.rotate + 360,
-                    opacity: 1,
-                  }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 2 + Math.random() }}
-                />
+            <p className="text-lg font-bold mb-4">{q.question}</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {q.options.map((o) => (
+                <button
+                  key={o}
+                  className="px-5 py-3 bg-gradient-to-r from-pink-400 to-pink-500 text-white rounded-2xl shadow hover:scale-105 transition-transform font-bold"
+                  onClick={() => handleAnswer(o, q, stories)}
+                >
+                  {o}
+                </button>
               ))}
-          </AnimatePresence>
-        </>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showConfetti &&
+          confettiParticles.map((c, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                left: c.x,
+                top: c.y,
+                width: c.size,
+                height: c.size,
+                backgroundColor: c.color,
+              }}
+              initial={{ y: c.y, rotate: c.rotate, opacity: 1 }}
+              animate={{
+                y: window.innerHeight + 50,
+                rotate: c.rotate + 360,
+                opacity: 1,
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2 + Math.random() }}
+            />
+          ))}
+      </AnimatePresence>
 
       <style jsx>{`
         .animate-shake {
