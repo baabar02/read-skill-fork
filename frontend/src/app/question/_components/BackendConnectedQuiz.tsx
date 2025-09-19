@@ -15,15 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { Loader2, CheckCircle, XCircle, BookOpen, Brain } from "lucide-react";
 
 import {
   GenerateMcqQuestionsDocument,
   SubmitAnswerDocument,
-  GetQuestionsDocument,
-  GetUserScoreDocument,
 } from "../../../../graphql/generated";
+import { useUser } from "@/app/providers/UserProvider";
 
 type Question = {
   id: string;
@@ -52,14 +51,20 @@ type AnswerResult = {
 };
 
 export default function BackendConnectedQuiz() {
-  // const { userId } = useAuth();
+  function useAuth() {
+    const { user } = useUser();
+    return { user, userId: user?.id };
+  }
+
+  const { userId, user } = useAuth();
+  console.log(user, "user");
+
   const [bookId, setBookId] = useState<string>("");
 
   const [content, setContent] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);
   const [language, setLanguage] = useState("Mongolian");
-  const [userId, setUserId] = useState<string>("68cb7d596d309dc811ee1544");
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -116,6 +121,7 @@ export default function BackendConnectedQuiz() {
         setSubmittedAnswers({});
         setShowResults(false);
       }
+      console.log(result.data?.generateMCQQuestions, "generate questions");
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to generate questions.");
@@ -125,6 +131,11 @@ export default function BackendConnectedQuiz() {
   };
 
   const handleSubmitAnswer = async (questionId: string, userAnswer: string) => {
+    if (!user) {
+      alert("Та эхлээд нэвтэрсэн байх шаардлагатай.");
+      return;
+    }
+
     try {
       const result = await submitAnswer({
         variables: {
@@ -480,16 +491,4 @@ export default function BackendConnectedQuiz() {
       </CardContent>
     </Card>
   );
-}
-function userProgress(arg0: {
-  variables: {
-    userId: string;
-    bookId: string | undefined;
-    chapterId: string;
-    questionId: string;
-    answer: string;
-    timeDuration: number;
-  };
-}) {
-  throw new Error("Function not implemented.");
 }

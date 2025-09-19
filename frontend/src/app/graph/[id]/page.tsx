@@ -1,11 +1,17 @@
 "use client";
 
 import React from "react";
-import { useGetUserProgressQuery } from "../../../graphql/generated";
-import UserProgressChart from "./_components/progress-chart";
+import { useGetUserProgressQuery } from "../../../../graphql/generated";
+import UserProgressChart from "./_components/chart";
+import { useParams } from "next/navigation";
 
 export default function ChartPage() {
-  const userId = "68cb7d596d309dc811ee1544";
+  const { id } = useParams();
+  const userId = Array.isArray(id) ? id[0] : id;
+
+  if (!userId) {
+    return <div>User ID is missing</div>;
+  }
 
   const { data, loading, error } = useGetUserProgressQuery({
     variables: { userId },
@@ -20,7 +26,7 @@ export default function ChartPage() {
       isCorrect: item.isCorrect,
       timeDuration: item.timeDuration || 0,
       answer: item.answer,
-      userId: userId,
+      userId: userId!,
     })) || [];
 
   return (

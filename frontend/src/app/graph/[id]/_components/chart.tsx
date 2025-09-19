@@ -22,7 +22,7 @@ type ProgressItem = {
   isCorrect: boolean;
   timeDuration: number;
   answer: string;
-  userId:string
+  userId:string;
 };
 
 type Props = {
