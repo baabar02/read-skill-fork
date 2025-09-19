@@ -1,3 +1,24 @@
+query GetUsers {
+  getUsers {
+    id
+    name
+    email
+  }
+}
+
+query GetBooks {
+  getBooks {
+    id
+    title
+    author
+    chapters
+    categories
+    content
+    image
+    audio_url
+  }
+}
+
 mutation AddBook(
   $title: String!
   $content: String!

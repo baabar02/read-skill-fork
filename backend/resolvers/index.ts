@@ -18,6 +18,7 @@ export const resolvers = {
     getQuestionsForBook: Query.getQuestionsForBook,
     getUserAnswers: Query.getUserAnswers,
     getUserScore: Query.getUserScore,
+
     getBookById: Query.getBookById,
     getBooks: Query.getBooks,
     getUserProgress: Query.getUserProgress,

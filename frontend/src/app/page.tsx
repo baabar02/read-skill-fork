@@ -1,5 +1,14 @@
 'use client'
 
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useGetUsersQuery } from "../../graphql/generated";
+import { ReadingTestContainer } from "./_components/ReadingTest/ReadingTestContainer";
+
+const Home = () => {
+  const { data } = useGetUsersQuery();
+  const [showReadingCard, setShowReadingCard] = useState(false);
+
 import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -14,6 +23,7 @@ export default function LandingPage() {
           </div>
         </div>
 
+
         <div className="flex items-center gap-3">
           <Link href="/admin">
             <div className="px-4 py-2 bg-white text-pink-600 rounded-2xl font-medium shadow-sm">
@@ -27,6 +37,25 @@ export default function LandingPage() {
           </Link>
         </div>
       </header>
+
+
+  return (
+    <div className="">
+      <Button variant="outline" onClick={() => setShowReadingCard(true)}>
+        Add
+      </Button>
+
+      {showReadingCard && (
+        <div
+          className="fixed inset-0 bg-gray-50 bg-opacity-100 flex items-center justify-center z-50"
+          onClick={() => setShowReadingCard(false)}
+        >
+          <ReadingTestContainer onClose={() => setShowReadingCard(false)} />
+        </div>
+      )}
+    </div>
+  );
+};
 
       <section className="text-center py-12 px-4">
         <motion.h1

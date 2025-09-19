@@ -97,9 +97,11 @@ type UserScore {
     getUserAnswers(userId: ID!, bookId: ID, chapterId: ID): [Answer!]!
     getUserScore(userId: ID!, bookId: ID, chapterId: ID): UserScore!
     getBooks: [Book!]!
+
     getBookById(bookId:ID!): Book!
     getUserProgress(userId:ID!): [UserProgressResponse]
     getUserById(userId:ID!) : User!
+
   }
 
  type UserProgressResponse {
