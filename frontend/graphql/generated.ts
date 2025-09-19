@@ -41,6 +41,12 @@ export type AnswerResult = {
   userAnswer: Scalars['String']['output'];
 };
 
+export type AuthPayload = {
+  __typename?: 'AuthPayload';
+  token: Scalars['String']['output'];
+  user: User;
+};
+
 export type Book = {
   __typename?: 'Book';
   audio_url: Array<Scalars['String']['output']>;
@@ -82,11 +88,13 @@ export type Mutation = {
   __typename?: 'Mutation';
   addBook: Book;
   addContent: Chapter;
-  createUser: User;
+  createUser: AuthPayload;
   generateMCQQuestions: Array<Question>;
   generateQuestions: Array<Scalars['String']['output']>;
   generateQuestionsWithContent: GeneratedQuestions;
+  loginUser: AuthPayload;
   submitAnswer: AnswerResult;
+  userProgress?: Maybe<UserProgressResult>;
 };
 
 
@@ -110,7 +118,6 @@ export type MutationAddContentArgs = {
 
 
 export type MutationCreateUserArgs = {
-  email: Scalars['String']['input'];
   name: Scalars['String']['input'];
 };
 
@@ -139,20 +146,41 @@ export type MutationGenerateQuestionsWithContentArgs = {
 };
 
 
+export type MutationLoginUserArgs = {
+  name: Scalars['String']['input'];
+};
+
+
 export type MutationSubmitAnswerArgs = {
   bookId?: InputMaybe<Scalars['ID']['input']>;
   chapterId?: InputMaybe<Scalars['ID']['input']>;
   questionId: Scalars['ID']['input'];
   userAnswer: Scalars['String']['input'];
-  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationUserProgressArgs = {
+  answer: Scalars['String']['input'];
+  questionId: Scalars['ID']['input'];
+  timeDuration: Scalars['Int']['input'];
+  userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  getBookById: Book;
+  getBooks: Array<Book>;
   getQuestionsForBook: Array<Question>;
   getUserAnswers: Array<Answer>;
+  getUserById: User;
+  getUserProgress: Array<UserProgress>;
   getUserScore: UserScore;
   getUsers: Array<User>;
+};
+
+
+export type QueryGetBookByIdArgs = {
+  bookId: Scalars['ID']['input'];
 };
 
 
@@ -165,6 +193,16 @@ export type QueryGetQuestionsForBookArgs = {
 export type QueryGetUserAnswersArgs = {
   bookId?: InputMaybe<Scalars['ID']['input']>;
   chapterId?: InputMaybe<Scalars['ID']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetUserByIdArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetUserProgressArgs = {
   userId: Scalars['ID']['input'];
 };
 
@@ -195,9 +233,32 @@ export type QuestionOptions = {
 
 export type User = {
   __typename?: 'User';
-  email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  token?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserProgress = {
+  __typename?: 'UserProgress';
+  answer: Scalars['String']['output'];
+  completed?: Maybe<Scalars['Boolean']['output']>;
+  explanation?: Maybe<Scalars['String']['output']>;
+  isCorrect: Scalars['Boolean']['output'];
+  question: Scalars['String']['output'];
+  questionId: Scalars['ID']['output'];
+  score?: Maybe<Scalars['Int']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timeDuration?: Maybe<Scalars['Int']['output']>;
+  userName?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserProgressResult = {
+  __typename?: 'UserProgressResult';
+  explanation?: Maybe<Scalars['String']['output']>;
+  isCorrect?: Maybe<Scalars['Boolean']['output']>;
+  score?: Maybe<Scalars['Int']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  userName?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserScore = {
@@ -224,6 +285,13 @@ export type AddBookMutationVariables = Exact<{
 
 export type AddBookMutation = { __typename?: 'Mutation', addBook: { __typename?: 'Book', id: string, title: string, author: string, chapters: number, categories: Array<string>, content: Array<string>, image: Array<string>, audio_url: Array<string> } };
 
+export type CreateUserMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthPayload', token: string, user: { __typename?: 'User', id: string, name: string } } };
+
 export type GenerateMcqQuestionsMutationVariables = Exact<{
   content: Scalars['String']['input'];
   bookId?: InputMaybe<Scalars['ID']['input']>;
@@ -243,6 +311,18 @@ export type GenerateQuestionsMutationVariables = Exact<{
 
 export type GenerateQuestionsMutation = { __typename?: 'Mutation', generateQuestions: Array<string> };
 
+export type GetBookByIdQueryVariables = Exact<{
+  bookId: Scalars['ID']['input'];
+}>;
+
+
+export type GetBookByIdQuery = { __typename?: 'Query', getBookById: { __typename?: 'Book', id: string, title: string, chapters: number, author: string, categories: Array<string>, content: Array<string>, image: Array<string>, audio_url: Array<string> } };
+
+export type GetBooksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBooksQuery = { __typename?: 'Query', getBooks: Array<{ __typename?: 'Book', id: string, title: string, chapters: number, author: string, categories: Array<string>, content: Array<string>, image: Array<string>, audio_url: Array<string> }> };
+
 export type GetQuestionsQueryVariables = Exact<{
   bookId?: InputMaybe<Scalars['ID']['input']>;
   chapterId?: InputMaybe<Scalars['ID']['input']>;
@@ -250,6 +330,20 @@ export type GetQuestionsQueryVariables = Exact<{
 
 
 export type GetQuestionsQuery = { __typename?: 'Query', getQuestionsForBook: Array<{ __typename?: 'Question', id: string, bookId: string, chapterId?: string | null, question: string, answer: string, createdAt: string, updatedAt: string, option?: { __typename?: 'QuestionOptions', options: Array<string>, explanation: string } | null }> };
+
+export type QueryQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type QueryQuery = { __typename?: 'Query', getUserById: { __typename?: 'User', id: string, name: string } };
+
+export type GetUserProgressQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type GetUserProgressQuery = { __typename?: 'Query', getUserProgress: Array<{ __typename?: 'UserProgress', questionId: string, answer: string, isCorrect: boolean, timeDuration?: number | null, userName?: string | null, completed?: boolean | null, explanation?: string | null, score?: number | null, success?: boolean | null }> };
 
 export type GetUserScoreQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -263,18 +357,32 @@ export type GetUserScoreQuery = { __typename?: 'Query', getUserScore: { __typena
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', getUsers: Array<{ __typename?: 'User', id: string, name: string, email: string }> };
+export type GetUsersQuery = { __typename?: 'Query', getUsers: Array<{ __typename?: 'User', id: string, name: string }> };
+
+export type LoginUserMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+}>;
+
+
+export type LoginUserMutation = { __typename?: 'Mutation', loginUser: { __typename?: 'AuthPayload', token: string, user: { __typename?: 'User', id: string, name: string } } };
 
 export type SubmitAnswerMutationVariables = Exact<{
   questionId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
   userAnswer: Scalars['String']['input'];
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
 export type SubmitAnswerMutation = { __typename?: 'Mutation', submitAnswer: { __typename?: 'AnswerResult', id: string, questionId: string, userAnswer: string, correctAnswer: string, isCorrect: boolean, explanation?: string | null, options?: { __typename?: 'QuestionOptions', options: Array<string>, explanation: string } | null } };
+
+export type UserProgressMutationVariables = Exact<{
+  questionId: Scalars['ID']['input'];
+  answer: Scalars['String']['input'];
+  timeDuration: Scalars['Int']['input'];
+  userId?: InputMaybe<Scalars['ID']['input']>;
+}>;
+
+
+export type UserProgressMutation = { __typename?: 'Mutation', userProgress?: { __typename?: 'UserProgressResult', success?: boolean | null, isCorrect?: boolean | null, score?: number | null, explanation?: string | null } | null };
 
 
 export const AddBookDocument = gql`
@@ -331,6 +439,43 @@ export function useAddBookMutation(baseOptions?: Apollo.MutationHookOptions<AddB
 export type AddBookMutationHookResult = ReturnType<typeof useAddBookMutation>;
 export type AddBookMutationResult = Apollo.MutationResult<AddBookMutation>;
 export type AddBookMutationOptions = Apollo.BaseMutationOptions<AddBookMutation, AddBookMutationVariables>;
+export const CreateUserDocument = gql`
+    mutation CreateUser($name: String!) {
+  createUser(name: $name) {
+    user {
+      id
+      name
+    }
+    token
+  }
+}
+    `;
+export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+
+/**
+ * __useCreateUserMutation__
+ *
+ * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
+      }
+export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
+export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
 export const GenerateMcqQuestionsDocument = gql`
     mutation GenerateMCQQuestions($content: String!, $bookId: ID, $chapterId: ID, $difficulty: String, $numberOfQuestions: Int, $language: String) {
   generateMCQQuestions(
@@ -417,6 +562,99 @@ export function useGenerateQuestionsMutation(baseOptions?: Apollo.MutationHookOp
 export type GenerateQuestionsMutationHookResult = ReturnType<typeof useGenerateQuestionsMutation>;
 export type GenerateQuestionsMutationResult = Apollo.MutationResult<GenerateQuestionsMutation>;
 export type GenerateQuestionsMutationOptions = Apollo.BaseMutationOptions<GenerateQuestionsMutation, GenerateQuestionsMutationVariables>;
+export const GetBookByIdDocument = gql`
+    query GetBookById($bookId: ID!) {
+  getBookById(bookId: $bookId) {
+    id
+    title
+    chapters
+    author
+    categories
+    content
+    image
+    audio_url
+  }
+}
+    `;
+
+/**
+ * __useGetBookByIdQuery__
+ *
+ * To run a query within a React component, call `useGetBookByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBookByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBookByIdQuery({
+ *   variables: {
+ *      bookId: // value for 'bookId'
+ *   },
+ * });
+ */
+export function useGetBookByIdQuery(baseOptions: Apollo.QueryHookOptions<GetBookByIdQuery, GetBookByIdQueryVariables> & ({ variables: GetBookByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBookByIdQuery, GetBookByIdQueryVariables>(GetBookByIdDocument, options);
+      }
+export function useGetBookByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBookByIdQuery, GetBookByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBookByIdQuery, GetBookByIdQueryVariables>(GetBookByIdDocument, options);
+        }
+export function useGetBookByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBookByIdQuery, GetBookByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBookByIdQuery, GetBookByIdQueryVariables>(GetBookByIdDocument, options);
+        }
+export type GetBookByIdQueryHookResult = ReturnType<typeof useGetBookByIdQuery>;
+export type GetBookByIdLazyQueryHookResult = ReturnType<typeof useGetBookByIdLazyQuery>;
+export type GetBookByIdSuspenseQueryHookResult = ReturnType<typeof useGetBookByIdSuspenseQuery>;
+export type GetBookByIdQueryResult = Apollo.QueryResult<GetBookByIdQuery, GetBookByIdQueryVariables>;
+export const GetBooksDocument = gql`
+    query GetBooks {
+  getBooks {
+    id
+    title
+    chapters
+    author
+    categories
+    content
+    image
+    audio_url
+  }
+}
+    `;
+
+/**
+ * __useGetBooksQuery__
+ *
+ * To run a query within a React component, call `useGetBooksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetBooksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetBooksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetBooksQuery(baseOptions?: Apollo.QueryHookOptions<GetBooksQuery, GetBooksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetBooksQuery, GetBooksQueryVariables>(GetBooksDocument, options);
+      }
+export function useGetBooksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetBooksQuery, GetBooksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetBooksQuery, GetBooksQueryVariables>(GetBooksDocument, options);
+        }
+export function useGetBooksSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetBooksQuery, GetBooksQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetBooksQuery, GetBooksQueryVariables>(GetBooksDocument, options);
+        }
+export type GetBooksQueryHookResult = ReturnType<typeof useGetBooksQuery>;
+export type GetBooksLazyQueryHookResult = ReturnType<typeof useGetBooksLazyQuery>;
+export type GetBooksSuspenseQueryHookResult = ReturnType<typeof useGetBooksSuspenseQuery>;
+export type GetBooksQueryResult = Apollo.QueryResult<GetBooksQuery, GetBooksQueryVariables>;
 export const GetQuestionsDocument = gql`
     query GetQuestions($bookId: ID, $chapterId: ID) {
   getQuestionsForBook(bookId: $bookId, chapterId: $chapterId) {
@@ -468,6 +706,95 @@ export type GetQuestionsQueryHookResult = ReturnType<typeof useGetQuestionsQuery
 export type GetQuestionsLazyQueryHookResult = ReturnType<typeof useGetQuestionsLazyQuery>;
 export type GetQuestionsSuspenseQueryHookResult = ReturnType<typeof useGetQuestionsSuspenseQuery>;
 export type GetQuestionsQueryResult = Apollo.QueryResult<GetQuestionsQuery, GetQuestionsQueryVariables>;
+export const QueryDocument = gql`
+    query Query($userId: ID!) {
+  getUserById(userId: $userId) {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useQueryQuery__
+ *
+ * To run a query within a React component, call `useQueryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useQueryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useQueryQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useQueryQuery(baseOptions: Apollo.QueryHookOptions<QueryQuery, QueryQueryVariables> & ({ variables: QueryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<QueryQuery, QueryQueryVariables>(QueryDocument, options);
+      }
+export function useQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<QueryQuery, QueryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<QueryQuery, QueryQueryVariables>(QueryDocument, options);
+        }
+export function useQuerySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<QueryQuery, QueryQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<QueryQuery, QueryQueryVariables>(QueryDocument, options);
+        }
+export type QueryQueryHookResult = ReturnType<typeof useQueryQuery>;
+export type QueryLazyQueryHookResult = ReturnType<typeof useQueryLazyQuery>;
+export type QuerySuspenseQueryHookResult = ReturnType<typeof useQuerySuspenseQuery>;
+export type QueryQueryResult = Apollo.QueryResult<QueryQuery, QueryQueryVariables>;
+export const GetUserProgressDocument = gql`
+    query GetUserProgress($userId: ID!) {
+  getUserProgress(userId: $userId) {
+    questionId
+    answer
+    isCorrect
+    timeDuration
+    userName
+    completed
+    explanation
+    score
+    success
+  }
+}
+    `;
+
+/**
+ * __useGetUserProgressQuery__
+ *
+ * To run a query within a React component, call `useGetUserProgressQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserProgressQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserProgressQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserProgressQuery(baseOptions: Apollo.QueryHookOptions<GetUserProgressQuery, GetUserProgressQueryVariables> & ({ variables: GetUserProgressQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserProgressQuery, GetUserProgressQueryVariables>(GetUserProgressDocument, options);
+      }
+export function useGetUserProgressLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserProgressQuery, GetUserProgressQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserProgressQuery, GetUserProgressQueryVariables>(GetUserProgressDocument, options);
+        }
+export function useGetUserProgressSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserProgressQuery, GetUserProgressQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetUserProgressQuery, GetUserProgressQueryVariables>(GetUserProgressDocument, options);
+        }
+export type GetUserProgressQueryHookResult = ReturnType<typeof useGetUserProgressQuery>;
+export type GetUserProgressLazyQueryHookResult = ReturnType<typeof useGetUserProgressLazyQuery>;
+export type GetUserProgressSuspenseQueryHookResult = ReturnType<typeof useGetUserProgressSuspenseQuery>;
+export type GetUserProgressQueryResult = Apollo.QueryResult<GetUserProgressQuery, GetUserProgressQueryVariables>;
 export const GetUserScoreDocument = gql`
     query GetUserScore($userId: ID!, $bookId: ID, $chapterId: ID) {
   getUserScore(userId: $userId, bookId: $bookId, chapterId: $chapterId) {
@@ -521,7 +848,6 @@ export const GetUsersDocument = gql`
   getUsers {
     id
     name
-    email
   }
 }
     `;
@@ -557,15 +883,46 @@ export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
 export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
 export type GetUsersSuspenseQueryHookResult = ReturnType<typeof useGetUsersSuspenseQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export const LoginUserDocument = gql`
+    mutation LoginUser($name: String!) {
+  loginUser(name: $name) {
+    user {
+      id
+      name
+    }
+    token
+  }
+}
+    `;
+export type LoginUserMutationFn = Apollo.MutationFunction<LoginUserMutation, LoginUserMutationVariables>;
+
+/**
+ * __useLoginUserMutation__
+ *
+ * To run a mutation, you first call `useLoginUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginUserMutation, { data, loading, error }] = useLoginUserMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useLoginUserMutation(baseOptions?: Apollo.MutationHookOptions<LoginUserMutation, LoginUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginUserMutation, LoginUserMutationVariables>(LoginUserDocument, options);
+      }
+export type LoginUserMutationHookResult = ReturnType<typeof useLoginUserMutation>;
+export type LoginUserMutationResult = Apollo.MutationResult<LoginUserMutation>;
+export type LoginUserMutationOptions = Apollo.BaseMutationOptions<LoginUserMutation, LoginUserMutationVariables>;
 export const SubmitAnswerDocument = gql`
-    mutation SubmitAnswer($questionId: ID!, $userId: ID!, $userAnswer: String!, $bookId: ID, $chapterId: ID) {
-  submitAnswer(
-    questionId: $questionId
-    userId: $userId
-    userAnswer: $userAnswer
-    bookId: $bookId
-    chapterId: $chapterId
-  ) {
+    mutation SubmitAnswer($questionId: ID!, $userAnswer: String!) {
+  submitAnswer(questionId: $questionId, userAnswer: $userAnswer) {
     id
     questionId
     userAnswer
@@ -595,10 +952,7 @@ export type SubmitAnswerMutationFn = Apollo.MutationFunction<SubmitAnswerMutatio
  * const [submitAnswerMutation, { data, loading, error }] = useSubmitAnswerMutation({
  *   variables: {
  *      questionId: // value for 'questionId'
- *      userId: // value for 'userId'
  *      userAnswer: // value for 'userAnswer'
- *      bookId: // value for 'bookId'
- *      chapterId: // value for 'chapterId'
  *   },
  * });
  */
@@ -609,3 +963,47 @@ export function useSubmitAnswerMutation(baseOptions?: Apollo.MutationHookOptions
 export type SubmitAnswerMutationHookResult = ReturnType<typeof useSubmitAnswerMutation>;
 export type SubmitAnswerMutationResult = Apollo.MutationResult<SubmitAnswerMutation>;
 export type SubmitAnswerMutationOptions = Apollo.BaseMutationOptions<SubmitAnswerMutation, SubmitAnswerMutationVariables>;
+export const UserProgressDocument = gql`
+    mutation UserProgress($questionId: ID!, $answer: String!, $timeDuration: Int!, $userId: ID) {
+  userProgress(
+    questionId: $questionId
+    answer: $answer
+    timeDuration: $timeDuration
+    userId: $userId
+  ) {
+    success
+    isCorrect
+    score
+    explanation
+  }
+}
+    `;
+export type UserProgressMutationFn = Apollo.MutationFunction<UserProgressMutation, UserProgressMutationVariables>;
+
+/**
+ * __useUserProgressMutation__
+ *
+ * To run a mutation, you first call `useUserProgressMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserProgressMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userProgressMutation, { data, loading, error }] = useUserProgressMutation({
+ *   variables: {
+ *      questionId: // value for 'questionId'
+ *      answer: // value for 'answer'
+ *      timeDuration: // value for 'timeDuration'
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useUserProgressMutation(baseOptions?: Apollo.MutationHookOptions<UserProgressMutation, UserProgressMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserProgressMutation, UserProgressMutationVariables>(UserProgressDocument, options);
+      }
+export type UserProgressMutationHookResult = ReturnType<typeof useUserProgressMutation>;
+export type UserProgressMutationResult = Apollo.MutationResult<UserProgressMutation>;
+export type UserProgressMutationOptions = Apollo.BaseMutationOptions<UserProgressMutation, UserProgressMutationVariables>;

@@ -5,3 +5,5 @@ export * from "./question-mutation";
 export * from "./generate-question-mutation";
 export * from "./multiple-option-mutation";
 export * from "./answer-mutation";
+export * from "./user-progress-mutation";
+export * from "./login-mutation";

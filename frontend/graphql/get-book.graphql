@@ -1,0 +1,12 @@
+query GetBookById($bookId: ID!) {
+  getBookById(bookId: $bookId) {
+    id
+    title
+    chapters
+    author
+    categories
+    content
+    image
+    audio_url
+  }
+}

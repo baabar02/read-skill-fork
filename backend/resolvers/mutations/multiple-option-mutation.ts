@@ -2,6 +2,7 @@ import { OpenAI } from "openai";
 import { Question } from "../../models/question-model";
 import { Book } from "../../models/book-model";
 import { Chapter } from "../../models/chapter-model";
+import { sanitizeJsonFromAI } from "./sanitaze-json-mutation";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,6 +17,10 @@ export const generateMCQQuestions = async (
     difficulty?: "easy" | "medium" | "hard";
     numberOfQuestions?: number;
     language?: string;
+    option: {
+      options: string[];
+      explanation: string;
+    };
   }
 ) => {
   try {
@@ -23,7 +28,6 @@ export const generateMCQQuestions = async (
       throw new Error("OpenAI API key is not configured");
     }
 
-    // ---- Агуулга ачаалж авах ---- //
     let contentToUse = args.content?.trim();
 
     if (!contentToUse) {
@@ -44,10 +48,9 @@ export const generateMCQQuestions = async (
         throw new Error("Номын контент олдсонгүй");
       }
 
-      contentToUse = book.content.join("\n"); // массив байвал нэгтгэх
+      contentToUse = book.content.join("\n");
     }
 
-    // ---- chapterId шалгах (хэрвээ өгөгдсөн бол) ---- //
     if (args.chapterId) {
       const chapter = await Chapter.findById(args.chapterId);
       if (!chapter) {
@@ -75,7 +78,9 @@ export const generateMCQQuestions = async (
           4. Тайлбар (яагаад энэ хариулт зөв болохыг тайлбарлана)
           
           Object форматаар хариулна уу:
-          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]`,
+          [{question: "...", options: ["A", "B", "C", "D"], correctAnswer: "A", explanation: "..."}]
+         ONLY respond with valid JSON array, no explanations, no markdown, no extra text, no trailing commas, and use double quotes.
+`,
         },
         {
           role: "user",
@@ -85,26 +90,48 @@ export const generateMCQQuestions = async (
     });
 
     const result = completion.choices[0]?.message?.content;
-    if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
+    console.log("AI-ийн хариу: ", result);
 
-    // ---- JSON parse хийх ---- //
+    if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
+    console.log(result);
+
     const jsonMatch = result.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       throw new Error("AI-аас буруу форматаар хариу ирсэн байна");
     }
+    let questionsData;
+    try {
+      questionsData = JSON.parse(jsonMatch[0]);
+    } catch (err) {
+      console.error("❌ JSON Parse Error:", err);
+      throw new Error(
+        "AI-аас ирсэн JSON буруу байна. Магадгүй JSON массив бүрэн биш."
+      );
+    }
 
-    const questionsData = JSON.parse(jsonMatch[0]);
+    // const result = completion.choices[0]?.message?.content;
+    if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
 
-    // ---- DB-д хадгалах ---- //
+    // let questionsData;
+    // try {
+    //   const cleanJson = sanitizeJsonFromAI(result);
+    //   questionsData = JSON.parse(cleanJson);
+    // } catch (err) {
+    //   console.error("❌ JSON Parse Error:", err);
+    //   throw new Error("AI-аас ирсэн JSON буруу байна. Засвар шаардлагатай.");
+    // }
+
+    // const questionsData = JSON.parse(jsonMatch[0]);
+
     const savedQuestions = [];
     for (const q of questionsData) {
       const question = new Question({
-        bookId: args.bookId || null,
-        chapterId: args.chapterId || null,
+        // bookId: args.bookId ?? "",
+        // chapterId: args.chapterId ?? "",
         question: q.question,
         answer: q.correctAnswer,
-        options: {
-          option: q.options,
+        option: {
+          options: q.options,
           explanation: q.explanation,
         },
       });

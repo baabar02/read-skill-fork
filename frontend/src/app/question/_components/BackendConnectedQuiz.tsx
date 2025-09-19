@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { UserProgressDocument } from "../../../../graphql/generated";
 import {
   Select,
   SelectContent,
@@ -14,16 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { Loader2, CheckCircle, XCircle, BookOpen, Brain } from "lucide-react";
 
-// GraphQL imports
 import {
   GenerateMcqQuestionsDocument,
   SubmitAnswerDocument,
-  GetQuestionsDocument,
-  GetUserScoreDocument,
 } from "../../../../graphql/generated";
+import { useUser } from "@/app/providers/UserProvider";
 
 type Question = {
   id: string;
@@ -38,6 +37,7 @@ type Question = {
 };
 
 type AnswerResult = {
+  timeDuration: number;
   id: string;
   questionId: string;
   userAnswer: string;
@@ -51,12 +51,21 @@ type AnswerResult = {
 };
 
 export default function BackendConnectedQuiz() {
-  // State management
+  function useAuth() {
+    const { user } = useUser();
+    return { user, userId: user?.id };
+  }
+
+  const { userId, user } = useAuth();
+  console.log(user, "user");
+
+  const [bookId, setBookId] = useState<string>("");
+
   const [content, setContent] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
   const [numberOfQuestions, setNumberOfQuestions] = useState(5);
   const [language, setLanguage] = useState("Mongolian");
-  const [userId, setUserId] = useState("user123"); // In real app, get from auth
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<
@@ -67,29 +76,41 @@ export default function BackendConnectedQuiz() {
   >({});
   const [showResults, setShowResults] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
-  // GraphQL mutations and queries
+  const [currentTimer, setCurrentTimer] = useState(0);
+
   const [generateMCQQuestions, { loading: generatingQuestions }] = useMutation(
     GenerateMcqQuestionsDocument
   );
+
+  const [recordUserProgress] = useMutation(UserProgressDocument);
+
   const [submitAnswer, { loading: submittingAnswer }] =
     useMutation(SubmitAnswerDocument);
 
-  // Generate questions from content
+  useEffect(() => {
+    setCurrentTimer(0);
+    const interval = setInterval(() => {
+      setCurrentTimer((prev) => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentQuestionIndex]);
+
   const handleGenerateQuestions = async () => {
-    if (!content.trim()) {
-      alert("Please enter some content to generate questions from");
-      return;
-    }
+    if (!content.trim()) return alert("Please enter some content.");
 
     setIsGenerating(true);
+    setStartTime(Date.now());
+
     try {
       const result = await generateMCQQuestions({
         variables: {
           content: content.trim(),
           difficulty,
-          numberOfQuestions: parseInt(numberOfQuestions.toString()),
+          numberOfQuestions,
           language,
+          bookId,
         },
       });
 
@@ -100,16 +121,21 @@ export default function BackendConnectedQuiz() {
         setSubmittedAnswers({});
         setShowResults(false);
       }
+      console.log(result.data?.generateMCQQuestions, "generate questions");
     } catch (error) {
-      console.error("Error generating questions:", error);
-      alert("Failed to generate questions. Please try again.");
+      console.error("Error:", error);
+      alert("Failed to generate questions.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  // Submit answer for current question
   const handleSubmitAnswer = async (questionId: string, userAnswer: string) => {
+    if (!user) {
+      alert("Та эхлээд нэвтэрсэн байх шаардлагатай.");
+      return;
+    }
+
     try {
       const result = await submitAnswer({
         variables: {
@@ -119,14 +145,29 @@ export default function BackendConnectedQuiz() {
         },
       });
 
-      if (result.data?.submitAnswer) {
-        const answerResult = result.data.submitAnswer;
+      const question = questions[currentQuestionIndex];
+      const answerResult = result.data?.submitAnswer;
+
+      if (answerResult) {
+        await recordUserProgress({
+          variables: {
+            userId,
+            bookId: question.bookId,
+            chapterId: question.chapterId ?? "",
+            questionId,
+            answer: userAnswer,
+            timeDuration: currentTimer,
+          },
+        });
+
         setSubmittedAnswers((prev) => ({
           ...prev,
-          [questionId]: answerResult,
+          [questionId]: {
+            ...answerResult,
+            timeDuration: currentTimer,
+          },
         }));
 
-        // Move to next question or show results
         if (currentQuestionIndex < questions.length - 1) {
           setCurrentQuestionIndex((prev) => prev + 1);
         } else {
@@ -135,11 +176,9 @@ export default function BackendConnectedQuiz() {
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
-      alert("Failed to submit answer. Please try again.");
     }
   };
 
-  // Handle option selection
   const handleOptionSelect = (questionId: string, option: string) => {
     setSelectedAnswers((prev) => ({
       ...prev,
@@ -147,7 +186,6 @@ export default function BackendConnectedQuiz() {
     }));
   };
 
-  // Calculate score
   const correctAnswers = Object.values(submittedAnswers).filter(
     (answer) => answer.isCorrect
   ).length;
@@ -156,6 +194,11 @@ export default function BackendConnectedQuiz() {
     totalQuestions > 0
       ? Math.round((correctAnswers / totalQuestions) * 100)
       : 0;
+
+  const totalTime = Object.values(submittedAnswers).reduce(
+    (acc, cur) => acc + cur.timeDuration,
+    0
+  );
 
   if (questions.length === 0) {
     return (
@@ -181,6 +224,7 @@ export default function BackendConnectedQuiz() {
                 onChange={(e) => setContent(e.target.value)}
                 className="min-h-[120px]"
               />
+              {/* <p onClick={}></p> */}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -194,6 +238,21 @@ export default function BackendConnectedQuiz() {
                     <SelectItem value="easy">Easy</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Label htmlFor="book">Select Book</Label>
+                <Select value={bookId} onValueChange={setBookId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a Book" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="68c7a4a33571925f591602ea">
+                      Book 1
+                    </SelectItem>
+                    <SelectItem value="68c8d45bfbe94c8fdaae725e">
+                      Book 2
+                    </SelectItem>
+                    {/* Бодит bookId-г ашиглана */}
                   </SelectContent>
                 </Select>
               </div>
@@ -259,6 +318,12 @@ export default function BackendConnectedQuiz() {
               Quiz Complete!
             </h2>
             <p className="text-gray-600">Here are your results</p>
+            <p className="text-gray-600">
+              {correctAnswers} / {totalQuestions} correct
+            </p>
+            <p className="text-lg text-blue-700 font-semibold">
+              Total Time: {totalTime} seconds
+            </p>
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-md">
@@ -363,6 +428,16 @@ export default function BackendConnectedQuiz() {
               }}
             />
           </div>
+        </div>
+        <div className="text-center mt-4 text-gray-600">
+          Total Reading Time:{" "}
+          <span className="font-semibold text-blue-700">
+            {Object.values(submittedAnswers).reduce(
+              (acc, curr) => acc + (curr.timeDuration || 0),
+              0
+            )}{" "}
+            seconds
+          </span>
         </div>
 
         {/* Question */}

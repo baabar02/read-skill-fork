@@ -2,7 +2,12 @@ export const typeDefs = `
   type User {
     id: ID!
     name: String!
-    email: String!
+    token:String
+  }
+
+  type AuthPayload{
+   user: User!
+  token: String!
   }
 
   type Book {
@@ -31,7 +36,7 @@ type Content {
 
 type Question {
   id: ID!
-  bookId: ID!
+  bookId: ID
   chapterId: ID
   question: String!
   answer: String!
@@ -45,7 +50,7 @@ type Answer {
   bookId: ID!
   chapterId: ID!
   questionId: ID!
-  userId: ID!
+  userId: String!
   answer: String!
   isCorrect: Boolean!
   createdAt: String!
@@ -92,34 +97,38 @@ type UserScore {
     getUserAnswers(userId: ID!, bookId: ID, chapterId: ID): [Answer!]!
     getUserScore(userId: ID!, bookId: ID, chapterId: ID): UserScore!
     getBooks: [Book!]!
+
+    getBookById(bookId:ID!): Book!
+    getUserProgress(userId:ID!): [UserProgressResponse]
+    getUserById(userId:ID!) : User!
+
   }
 
+ type UserProgressResponse {
+  questionId: ID
+  question: String
+  answer: String
+  isCorrect: Boolean
+  timeDuration: Float
+  userName: String
+  completed: Boolean
+  score: Int
+  explanation: String
+  success: Boolean
+
+}
+  
+
   type Mutation {
-    createUser(name: String!, email: String!): User!
+    createUser(name: String!): AuthPayload!
     addBook(title: String!, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]): Book!
     addContent(bookId:ID!, title:String, content:[String], audio_url:String): Chapter!
     generateQuestions(chapter: String!): [String!]!
-    generateQuestionsWithContent(
-      content: String!
-      bookId: ID
-      chapterId: ID
-      difficulty: String
-      numberOfQuestions: Int
-    ): GeneratedQuestions!
-    generateMCQQuestions(
-      content: String!
-      bookId: ID
-      chapterId: ID
-      difficulty: String
-      numberOfQuestions: Int
-      language: String
-    ): [Question!]!
-    submitAnswer(
-      questionId: ID!
-      userId: ID!
-      userAnswer: String!
-      bookId: ID
-      chapterId: ID
-    ): AnswerResult!
+    generateQuestionsWithContent(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int): GeneratedQuestions!
+    generateMCQQuestions(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int, language: String): [Question!]!
+    submitAnswer(questionId: ID!, userAnswer: String!, bookId: ID, chapterId: ID): AnswerResult!
+
+    userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!):UserProgressResponse
+    loginUser(name: String!): AuthPayload!
   }
 `;
