@@ -2,6 +2,12 @@ export const typeDefs = `
   type User {
     id: ID!
     name: String!
+    token:String
+  }
+
+  type AuthPayload{
+   user: User!
+  token: String!
   }
 
   type Book {
@@ -93,6 +99,7 @@ type UserScore {
     getBooks: [Book!]!
     getBookById(bookId:ID!): Book!
     getUserProgress(userId:ID!): [UserProgressResponse]
+    getUserById(userId:ID!) : User!
   }
 
  type UserProgressResponse {
@@ -110,9 +117,8 @@ type UserScore {
 }
   
 
-
   type Mutation {
-    createUser(name: String!): User!
+    createUser(name: String!): AuthPayload!
     addBook(title: String!, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]): Book!
     addContent(bookId:ID!, title:String, content:[String], audio_url:String): Chapter!
     generateQuestions(chapter: String!): [String!]!
@@ -121,5 +127,6 @@ type UserScore {
     submitAnswer(questionId: ID!, userAnswer: String!, bookId: ID, chapterId: ID): AnswerResult!
 
     userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!):UserProgressResponse
+    loginUser(name: String!): AuthPayload!
   }
 `;

@@ -101,13 +101,14 @@ export const generateMCQQuestions = async (
     }
     let questionsData;
     try {
-      questionsData = JSON.parse(result!);
+      questionsData = JSON.parse(jsonMatch[0]);
     } catch (err) {
       console.error("❌ JSON Parse Error:", err);
       throw new Error(
         "AI-аас ирсэн JSON буруу байна. Магадгүй JSON массив бүрэн биш."
       );
     }
+
     // const result = completion.choices[0]?.message?.content;
     if (!result) throw new Error("AI-гаас хоосон хариу ирсэн байна");
 

@@ -5,3 +5,4 @@ export * from "./get-user-score";
 export * from "./get-books";
 export * from "./get-all-books";
 export * from "./get-user-progress";
+export * from "./get-user-by-id";
