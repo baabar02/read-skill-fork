@@ -15,7 +15,7 @@ type User = {
 
 const UserSchema = new Schema<User>(
   {
-    name: { type: String, required: true },
+    name: { type: String, unique: true, required: true },
     // email: { type: String, required: true },
     // age: { type: Number, required: true },
     // role: { type: String, required: false, enum: ["admin", "user", "parent"] },
