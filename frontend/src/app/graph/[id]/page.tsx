@@ -2,8 +2,9 @@
 
 import React from "react";
 import { useGetUserProgressQuery } from "../../../../graphql/generated";
-import UserProgressChart from "./_components/chart";
+
 import { useParams } from "next/navigation";
+import UserProgressChart from "./_components/user-progress";
 
 export default function ChartPage() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function ChartPage() {
       questionId: item.questionId,
       isCorrect: item.isCorrect,
       timeDuration: item.timeDuration || 0,
+      timeAnswer: item.timeAnswer || 0,
       answer: item.answer,
       userId: userId!,
     })) || [];

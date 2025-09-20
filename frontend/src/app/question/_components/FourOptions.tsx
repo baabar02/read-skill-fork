@@ -145,16 +145,63 @@
 
 "use client";
 
-import React from "react";
-import { useQuery } from "@apollo/client";
-import { GetBooksDocument } from "../../../../graphql/generated"; // Энэ файлд таны getBooks query байгаа гэж бодъё
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, BookOpen } from "lucide-react";
+import { Loader2, BookOpen, Pencil, Trash } from "lucide-react";
+import {
+  useDeleteBookMutation,
+  useGetBooksFromAddBookQuery,
+  useUpdateBookMutation,
+} from "../../../../graphql/generated";
 
 export default function BookList() {
-  const { data, loading, error } = useQuery(GetBooksDocument);
+  const { data, loading, error, refetch } = useGetBooksFromAddBookQuery();
+  const [updateBook] = useUpdateBookMutation();
+  const [deleteBook] = useDeleteBookMutation();
 
+  const [editingBookId, setEditingBookId] = useState<string | null>(null);
+  const [editedTitle, setEditedTitle] = useState<string>("");
+
+  const handleEditClick = (bookId: string, currentTitle: string) => {
+    setEditingBookId(bookId);
+    setEditedTitle(currentTitle);
+  };
+
+  
+  const handleUpdate = async (bookId: string) => {
+    try {
+      await updateBook({
+        variables: {
+          bookId,
+          title: editedTitle,
+        },
+      });
+      setEditingBookId(null);
+      refetch();
+    } catch (err) {
+      console.error("📕 Update failed:", err);
+    }
+  };
+
+  const handleDelete = async (bookId: string) => {
+    try {
+      const confirmDelete = confirm(
+        "Та энэ номыг устгахдаа итгэлтэй байна уу?"
+      );
+      if (!confirmDelete) return;
+
+      await deleteBook({
+        variables: { bookId },
+      });
+      refetch(); // Refresh book list after deletion
+    } catch (err) {
+      console.error("❌ Delete failed:", err);
+    }
+  };
+
+  // -----------------------------
+  // UI States
+  // -----------------------------
   if (loading) {
     return (
       <div className="text-center py-10">
@@ -179,54 +226,100 @@ export default function BookList() {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {data.getBooks.map((book: any) => (
-          <Card
-            key={book.id}
-            className="shadow hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <CardContent className="p-4 flex flex-col items-start">
-              {book.image ? (
-                <img
-                  src={book.image}
-                  alt={book.title}
-                  className="w-full h-40 object-cover rounded-md mb-3"
-                />
-              ) : (
-                <div className="w-full h-40 bg-gray-200 rounded-md mb-3 flex items-center justify-center">
-                  <BookOpen className="w-12 h-12 text-gray-400" />
+        {data?.getBooks.map((book) => {
+          const isEditing = editingBookId === book.id;
+
+          return (
+            <Card
+              key={book.id}
+              className="shadow hover:shadow-lg transition-shadow"
+            >
+              <CardContent className="p-4 flex flex-col items-start">
+                {book.image?.[0] ? (
+                  <img
+                    src={book.image[0]}
+                    alt={book.title}
+                    className="w-full h-40 object-cover rounded-md mb-3"
+                  />
+                ) : (
+                  <div className="w-full h-40 bg-gray-200 rounded-md mb-3 flex items-center justify-center">
+                    <BookOpen className="w-12 h-12 text-gray-400" />
+                  </div>
+                )}
+
+                {/* Title + Edit Field */}
+                {isEditing ? (
+                  <div className="w-full">
+                    <input
+                      className="border px-2 py-1 rounded w-full mb-2"
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                    />
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleUpdate(book.id)}
+                        className="text-sm bg-green-500 text-white px-3 py-1 rounded"
+                      >
+                        Хадгалах
+                      </button>
+                      <button
+                        onClick={() => setEditingBookId(null)}
+                        className="text-sm text-gray-500"
+                      >
+                        Цуцлах
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex justify-between w-full items-center mb-1">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {book.title}
+                      </h3>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditClick(book.id, book.title)}
+                          className="text-blue-500 hover:text-blue-700"
+                          title="Засах"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(book.id)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Устгах"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                <p className="text-sm text-gray-600 mb-2">
+                  Зохиолч: {book.author}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {book.categories?.map((category: string, idx: number) => (
+                    <span
+                      key={idx}
+                      className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium"
+                    >
+                      {category}
+                    </span>
+                  ))}
                 </div>
-              )}
 
-              <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                {book.title}
-              </h3>
-              <p className="text-sm text-gray-600 mb-2">
-                Зохиолч: {book.author}
-              </p>
-
-              <p className="text-sm text-gray-500 line-clamp-3 whitespace-pre-wrap mb-2">
-                {book.content}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-2">
-                {book.categories?.map((category: string, idx: number) => (
-                  <span
-                    key={idx}
-                    className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium"
-                  >
-                    {category}
-                  </span>
-                ))}
-              </div>
-
-              {book.audio_url && (
-                <audio controls src={book.audio_url} className="w-full">
-                  Таны браузер аудио тоглуулагчийг дэмждэггүй.
-                </audio>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                {book.audio_url?.[0] && (
+                  <audio controls src={book.audio_url[0]} className="w-full">
+                    Таны браузер аудио тоглуулагчийг дэмждэггүй.
+                  </audio>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

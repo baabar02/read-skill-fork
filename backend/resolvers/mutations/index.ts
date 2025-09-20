@@ -7,3 +7,5 @@ export * from "./multiple-option-mutation";
 export * from "./answer-mutation";
 export * from "./user-progress-mutation";
 export * from "./login-mutation";
+export * from "./update-book-mutation";
+export * from "./delete-book-mutation";

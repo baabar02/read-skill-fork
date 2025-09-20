@@ -4,6 +4,7 @@ query GetUserProgress($userId: ID!) {
     answer
     isCorrect
     timeDuration
+    timeAnswer
     userName
     completed
     explanation

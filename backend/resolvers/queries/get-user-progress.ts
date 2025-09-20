@@ -2,7 +2,12 @@ import { UserProgress } from "../../models/user-progress-model";
 
 export const getUserProgress = async (
   _: unknown,
-  args: { userId: string; bookId?: string; chapterId?: string }
+  args: {
+    timeAnswer: any;
+    userId: string;
+    bookId?: string;
+    chapterId?: string;
+  }
 ) => {
   try {
     const query: any = { userId: args.userId };
@@ -31,6 +36,7 @@ export const getUserProgress = async (
         answer: item.answer,
         isCorrect: item.isCorrect,
         timeDuration: item.timeDuration,
+        timeAnswer: item.timeAnswer,
         userName: user?.name ?? "Unknown",
         completed: item.completed,
         score: item.score,

@@ -94,6 +94,7 @@ type UserProgress {
   answer: String!
   isCorrect: Boolean!
   timeDuration: Int
+  timeAnswer: Int
   userName: String
   completed: Boolean
   score: Int
@@ -118,11 +119,17 @@ type Query {
   getUserById(userId: ID!): User!
 }
 
+type DeleteResponse {
+  success: Boolean!
+  message: String
+}
+
 type Mutation {
   userProgress(
     questionId: ID!
     answer: String!
     timeDuration: Int!
+    timeAnswer: Int!
     userId: ID
   ): UserProgressResult
 
@@ -166,4 +173,17 @@ type Mutation {
     chapterId: ID
   ): AnswerResult!
   loginUser(name: String!): AuthPayload!
+
+  updateBook(
+    bookId: ID!
+    title: String
+    chapters: Int
+    author: String
+    categories: [String]
+    content: String
+    image: [String]
+    audio_url: [String]
+  ): Book!
+
+  deleteBook(bookId: ID!): DeleteResponse!
 }

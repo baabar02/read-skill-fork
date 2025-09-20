@@ -3,8 +3,11 @@ import { Topics } from "../library/_Components/Topics";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { UsersInfo } from "./_components/users";
+import { useGetUserProgressQuery } from "../../../../graphql/generated";
 
 const Dashboard = () => {
+
+
   return (
     <div className="">
       <Card className="p-2 md:p-10 h-screen">

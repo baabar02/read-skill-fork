@@ -38,6 +38,7 @@ type Question = {
 
 type AnswerResult = {
   timeDuration: number;
+  timeAnswer: number;
   id: string;
   questionId: string;
   userAnswer: string;
@@ -78,6 +79,10 @@ export default function BackendConnectedQuiz() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
 
+  const [isReading, setIsReading] = useState(false);
+  const [readingStartTime, setReadingStartTime] = useState<number | null>(null);
+  const [readingDuration, setReadingDuration] = useState(0);
+
   const [currentTimer, setCurrentTimer] = useState(0);
 
   const [generateMCQQuestions, { loading: generatingQuestions }] = useMutation(
@@ -102,6 +107,8 @@ export default function BackendConnectedQuiz() {
 
     setIsGenerating(true);
     setStartTime(Date.now());
+    setIsReading(false);
+    setReadingStartTime(null);
 
     try {
       const result = await generateMCQQuestions({
@@ -150,21 +157,28 @@ export default function BackendConnectedQuiz() {
 
       if (answerResult) {
         await recordUserProgress({
+          
           variables: {
             userId,
             bookId: question.bookId,
             chapterId: question.chapterId ?? "",
             questionId,
             answer: userAnswer,
-            timeDuration: currentTimer,
+            timeDuration: readingDuration ?? 0,
+            timeAnswer: currentTimer ?? 0,
           },
+
         });
+console.log("Submitting progress:", {
+  timeAnswer: currentTimer,
+  timeDuration: readingDuration,
+});
 
         setSubmittedAnswers((prev) => ({
           ...prev,
           [questionId]: {
             ...answerResult,
-            timeDuration: currentTimer,
+            timeDuration: readingDuration,
           },
         }));
 
@@ -200,6 +214,18 @@ export default function BackendConnectedQuiz() {
     0
   );
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isReading && readingStartTime !== null) {
+      interval = setInterval(() => {
+        setReadingDuration(Math.floor((Date.now() - readingStartTime) / 1000));
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isReading, readingStartTime]);
+
   if (questions.length === 0) {
     return (
       <Card className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -226,7 +252,22 @@ export default function BackendConnectedQuiz() {
               />
               {/* <p onClick={}></p> */}
             </div>
-
+            <Button
+              onClick={() => {
+                setIsReading(true);
+                setReadingStartTime(Date.now());
+              }}
+              disabled={isReading || !content.trim()}
+              className="bg-green-600 text-white"
+            >
+              Уншиж эхлэх
+            </Button>
+            {isReading && (
+              <p className="text-sm text-gray-600">
+                Уншиж буй хугацаа:{" "}
+                <span className="font-bold">{readingDuration} секунд</span>
+              </p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="difficulty">Difficulty</Label>
