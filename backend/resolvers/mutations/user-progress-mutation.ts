@@ -11,6 +11,7 @@ export const userProgress = async (
     questionId: string;
     answer: string;
     timeDuration: number;
+    timeAnswer: number;
   }
 ) => {
   try {
@@ -37,6 +38,7 @@ export const userProgress = async (
       completed: true,
       isCorrect: isCorrect,
       timeDuration: args.timeDuration,
+      timeAnswer: args.timeAnswer,
     });
 
     await newProgress.save();
@@ -47,7 +49,9 @@ export const userProgress = async (
       score,
       explanation: question.option?.explanation || "",
       userName,
+      
     };
+    
   } catch (error: any) {
     console.error("❌ UserProgress Error:", error);
     throw new Error(error.message);

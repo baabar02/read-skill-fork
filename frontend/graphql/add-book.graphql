@@ -2,11 +2,10 @@ query GetUsers {
   getUsers {
     id
     name
-    email
   }
 }
 
-query GetBooks {
+query GetBooksFromAddBook {
   getBooks {
     id
     title

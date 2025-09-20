@@ -12,6 +12,7 @@ type UserProgress = {
   completed: Boolean;
   isCorrect: Boolean;
   timeDuration: Number;
+  timeAnswer: Number;
   explanation?: string;
 };
 
@@ -32,6 +33,7 @@ const UserProgressSchema = new Schema<UserProgress>(
     completed: { type: Boolean, required: true },
     isCorrect: { type: Boolean, required: true },
     timeDuration: { type: Number, required: true },
+    timeAnswer: { type: Number, required: true },
   },
   { timestamps: true }
 );

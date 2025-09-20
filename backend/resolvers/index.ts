@@ -12,6 +12,8 @@ export const resolvers = {
     submitAnswer: Mutation.submitAnswer,
     userProgress: Mutation.userProgress,
     loginUser: Mutation.loginUser,
+    updateBook: Mutation.updateBook,
+    deleteBook: Mutation.deleteBook,
   },
   Query: {
     getUsers: Query.getUsers,
@@ -19,7 +21,7 @@ export const resolvers = {
     getUserAnswers: Query.getUserAnswers,
     getUserScore: Query.getUserScore,
 
-    getBookById: Query.getBookById,
+    // getBookById: Query.getBookById,
     getBooks: Query.getBooks,
     getUserProgress: Query.getUserProgress,
     getUserById: Query.getUserById,

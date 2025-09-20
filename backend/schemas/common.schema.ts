@@ -110,6 +110,7 @@ type UserScore {
   answer: String
   isCorrect: Boolean
   timeDuration: Float
+  timeAnswer:Float
   userName: String
   completed: Boolean
   score: Int
@@ -117,7 +118,10 @@ type UserScore {
   success: Boolean
 
 }
-  
+  type DeleteResponse {
+  success: Boolean!
+  message: String
+}
 
   type Mutation {
     createUser(name: String!): AuthPayload!
@@ -128,7 +132,9 @@ type UserScore {
     generateMCQQuestions(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int, language: String): [Question!]!
     submitAnswer(questionId: ID!, userAnswer: String!, bookId: ID, chapterId: ID): AnswerResult!
 
-    userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!):UserProgressResponse
+    userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!, timeAnswer:Int!):UserProgressResponse
     loginUser(name: String!): AuthPayload!
+   deleteBook(bookId: ID!): DeleteResponse!
+    updateBook(  bookId: ID!, title: String, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]) : Book!
   }
 `;
