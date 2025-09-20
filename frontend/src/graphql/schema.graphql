@@ -34,13 +34,19 @@ type Content {
 
 type Question {
   id: ID!
-  bookId: ID!
-  chapterId: ID
+  title: String!
+  text: String!
+  type: QuestionType!          
   question: String!
-  answer: String!
   option: QuestionOptions
+  createdBy: ID!
+  assignedTo: ID
   createdAt: String!
   updatedAt: String!
+}
+  enum QuestionType {
+  mcq
+  open
 }
 
 type Answer {
@@ -108,6 +114,13 @@ type UserProgressResult {
   explanation: String
   userName: String
 }
+
+ input QuestionOptionsInput {
+  options: [String!]!
+  answer: String!
+  explanation: String
+}
+
 type Query {
   getUsers: [User!]!
   getQuestionsForBook(bookId: ID, chapterId: ID): [Question!]!
@@ -186,4 +199,14 @@ type Mutation {
   ): Book!
 
   deleteBook(bookId: ID!): DeleteResponse!
+
+     createQuestion(
+    title: String!
+    text: String!
+    type: QuestionType!
+    question: String!
+    option: QuestionOptionsInput
+    createdBy: ID!
+    assignedTo: ID
+  ): [Question!]!
 }
