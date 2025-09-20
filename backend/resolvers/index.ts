@@ -14,6 +14,7 @@ export const resolvers = {
     loginUser: Mutation.loginUser,
     updateBook: Mutation.updateBook,
     deleteBook: Mutation.deleteBook,
+    createQuestion: Mutation.createQuestion
   },
   Query: {
     getUsers: Query.getUsers,

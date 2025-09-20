@@ -33,16 +33,28 @@ type Content {
   chapterId: ID!
   chapter: Chapter!
 }
+  
+  type QuestionOptions {
+  options: [String!]!
+  answer: String!
+  explanation: String
+}
 
 type Question {
   id: ID!
-  bookId: ID
-  chapterId: ID
+  title: String!
+  text: String!
+  type: String!          
   question: String!
-  answer: String!
   option: QuestionOptions
+  createdBy: ID!
+  assignedTo: ID
   createdAt: String!
   updatedAt: String!
+}
+  enum QuestionType {
+  mcq
+  open
 }
 
 type Answer {
@@ -91,6 +103,12 @@ type UserScore {
   percentage: Int!
 }
 
+  input QuestionOptionsInput {
+  options: [String!]!
+  answer: String!
+  explanation: String
+}
+
   type Query {
     getUsers: [User!]!
     getQuestionsForBook(bookId: ID, chapterId: ID): [Question!]!
@@ -101,7 +119,8 @@ type UserScore {
     getBookById(bookId:ID!): Book!
     getUserProgress(userId:ID!): [UserProgressResponse]
     getUserById(userId:ID!) : User!
-
+  questions: [Question!]!
+  question(id: ID!): Question
   }
 
  type UserProgressResponse {
@@ -136,5 +155,17 @@ type UserScore {
     loginUser(name: String!): AuthPayload!
    deleteBook(bookId: ID!): DeleteResponse!
     updateBook(  bookId: ID!, title: String, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]) : Book!
+     createQuestion(
+    title: String!
+    text: String!
+    type: String!
+    question: String!
+    option: QuestionOptionsInput
+    createdBy: ID!
+    assignedTo: ID
+  ):Question!
   }
+
+
+
 `;
