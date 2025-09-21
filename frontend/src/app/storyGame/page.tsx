@@ -13,7 +13,6 @@ type Question = {
   options: string[]
   answer: string
 }
-
 type Story = {
   id: number
   grade: number
@@ -21,7 +20,6 @@ type Story = {
   content: string
   questions: Question[]
 }
-
 type ConfettiParticle = {
   x: number
   y: number
@@ -36,18 +34,17 @@ const STORIES_BY_GRADE: { [grade: number]: Story[] } = {
   5: STORIES_5 as Story[],
 }
 
-// Level positions
 const LEVEL_POSITIONS = [
-  { x: 40, y: 500 },
-  { x: 120, y: 420 },
-  { x: 200, y: 370 },
-  { x: 280, y: 300 },
-  { x: 360, y: 240 },
-  { x: 280, y: 180 },
-  { x: 200, y: 130 },
-  { x: 320, y: 80 },
-  { x: 240, y: 40 },
-  { x: 120, y: 10 },
+  { x: '68%', y: '65%' },
+  { x: '47%', y: '57%' },
+  { x: '80%', y: '52%' },
+  { x: '53%', y: '45%' },
+  { x: '29%', y: '39%' },
+  { x: '61%', y: '33%' },
+  { x: '81%', y: '27%' },
+  { x: '40%', y: '22%' },
+  { x: '50%', y: '14%' },
+  { x: '78%', y: '8%' },
 ]
 
 const generateConfetti = (): ConfettiParticle[] =>
@@ -102,9 +99,7 @@ const StoryGame = () => {
           setScorePerLevel(
             Array(stories[currentStoryIndex + 1].questions.length).fill(0)
           )
-        } else {
-          setCompleted(true)
-        }
+        } else setCompleted(true)
       }
     } else {
       setShake(true)
@@ -155,15 +150,18 @@ const StoryGame = () => {
         </h1>
         <p className="text-xl font-semibold mt-4">Таны нийт оноо: {score}</p>
         <button
-          className="mt-6 px-6 py-3 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform"
+          className="fixed top-4 left-4 px-4 py-2 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform z-50"
           onClick={() => {
-            setGrade(null)
-            setCurrentStoryIndex(0)
-            setCurrentQuestionIndex(0)
-            setScorePerLevel([])
-            setCompletedLevels([])
-            setScore(0)
-            setCompleted(false)
+            if (!reading) setReading(true)
+            else {
+              setGrade(null)
+              setCurrentStoryIndex(0)
+              setCurrentQuestionIndex(0)
+              setScorePerLevel([])
+              setCompletedLevels([])
+              setScore(0)
+              setCompleted(false)
+            }
           }}
         >
           ← Буцах
@@ -172,180 +170,182 @@ const StoryGame = () => {
     )
 
   return (
-    <div className="relative min-h-screen p-4 bg-gradient-to-b from-yellow-100 to-pink-50 overflow-hidden">
-      <div className="fixed top-4 right-4 font-bold text-lg bg-white/80 px-3 py-1 rounded-xl shadow z-50">
-        Оноо: {score}
-      </div>
-
-      <button
-        className="absolute top-4 left-4 px-4 py-2 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform z-50"
-        onClick={() => {
-          if (!reading) setReading(true)
-          else {
-            setGrade(null)
-            setCurrentStoryIndex(0)
-            setCurrentQuestionIndex(0)
-            setScorePerLevel([])
-            setCompletedLevels([])
-            setScore(0)
-            setCompleted(false)
-          }
-        }}
+    <div className="relative min-h-screen p-4 bg-gradient-to-b from-yellow-100 to-pink-50 overflow-hidden flex justify-center">
+      <div
+        className="relative w-full max-w-[600px]"
+        style={{ aspectRatio: '3/4' }}
       >
-        ← Буцах
-      </button>
+        <div
+          className="absolute inset-0 bg-center bg-no-repeat bg-cover md:bg-contain -bg-conic-00"
+          style={{ backgroundImage: "url('/level-game-background.PNG')" }}
+        ></div>
 
-      {/* Decorative elements (hidden during reading) */}
-      {!reading && (
-        <div className="absolute w-full h-full top-0 left-0 md:mx-[30%] z-0">
-          <div className="absolute bg-green-300 rounded-full w-72 h-36 left-16 top-64 transform rotate-[-20deg]" />
-          <div className="absolute bg-green-400 rounded-full w-96 h-48 left-60 top-32 transform rotate-[-10deg]" />
-          <div className="absolute bg-blue-400 rounded-full w-48 h-12 left-20 top-130 opacity-70" />
-          <div className="absolute bg-gray-500 rounded-full w-12 h-12 left-72 top-180" />
-          <div className="absolute bg-gray-600 rounded-full w-8 h-8 left-40 top-100" />
+        <div className="fixed top-4 right-4 font-bold text-lg bg-white/80 px-3 py-1 rounded-xl shadow z-50">
+          Оноо: {score}
         </div>
-      )}
 
-      {/* Story reading */}
-      {reading && (
-        <div className="bg-white p-6 rounded-3xl shadow-xl text-lg mb-6 z-40 relative top-10">
-          <h2 className="text-xl font-bold mb-3 text-orange-600">
-            {currentStory.title}
-          </h2>
-          <p>{currentStory.content}</p>
-          <button
-            className="mt-6 w-full px-4 py-3 bg-gradient-to-r from-green-400 to-blue-400 text-white font-bold rounded-2xl shadow hover:scale-105 transition-transform"
-            onClick={() => setReading(false)}
-          >
-            Үлгэр уншиж дууслаа → Асуулт
-          </button>
-        </div>
-      )}
-
-      {!reading && (
-        <svg
-          className="absolute top-0 left-0 w-full h-full z-10 -ml-5 md:mx-[30%] pointer-events-none"
-          viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <polyline
-            points={LEVEL_POSITIONS.map((p) => `${p.x + 24},${p.y + 24}`).join(
-              ' '
-            )}
-            fill="none"
-            stroke="#F59E0B"
-            strokeWidth="5"
-            strokeDasharray="6"
-            strokeLinecap="round"
-          />
-        </svg>
-      )}
-
-      {!reading && (
-        <motion.div
-          className="w-10 h-10 flex items-center justify-center -ml-5 md:mx-[30%] text-2xl absolute z-30"
-          animate={{
-            left: LEVEL_POSITIONS[currentQuestionIndex].x,
-            top: LEVEL_POSITIONS[currentQuestionIndex].y,
+        <button
+          className="fixed top-4 left-4 px-4 py-2 bg-red-400 text-white font-bold rounded-xl shadow hover:scale-105 transition-transform z-50"
+          onClick={() => {
+            if (!reading) setReading(true)
+            else {
+              setGrade(null)
+              setCurrentStoryIndex(0)
+              setCurrentQuestionIndex(0)
+              setScorePerLevel([])
+              setCompletedLevels([])
+              setScore(0)
+              setCompleted(false)
+            }
           }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         >
-          🐰
-        </motion.div>
-      )}
+          ← Буцах
+        </button>
 
-      {!reading &&
-        LEVEL_POSITIONS.map((pos, idx) => (
-          <div
-            key={idx}
-            className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full -ml-5 md:mx-[30%] border-4 flex items-center justify-center font-bold cursor-pointer shadow-lg text-lg z-20
-              ${
+        <svg className="absolute inset-0 w-full h-full z-10 pointer-events-none">
+          {LEVEL_POSITIONS.map((pos, idx) => {
+            if (idx === 0) return null
+            const prev = LEVEL_POSITIONS[idx - 1]
+            return (
+              <line
+                key={idx}
+                x1={prev.x}
+                y1={prev.y}
+                x2={pos.x}
+                y2={pos.y}
+                stroke="#F97316"
+                strokeWidth={2}
+                strokeDasharray="8 4"
+              />
+            )
+          })}
+        </svg>
+
+        {reading && (
+          <div className="bg-white p-6 rounded-3xl shadow-xl text-lg mb-6 z-40 absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%]">
+            <h2 className="text-xl font-bold mb-3 text-orange-600">
+              {currentStory.title}
+            </h2>
+            <p>{currentStory.content}</p>
+            <button
+              className="mt-6 w-full px-4 py-3 bg-gradient-to-r from-green-400 to-blue-400 text-white font-bold rounded-2xl shadow hover:scale-105 transition-transform"
+              onClick={() => setReading(false)}
+            >
+              Үлгэр уншиж дууслаа → Асуулт
+            </button>
+          </div>
+        )}
+
+        {!reading && (
+          <motion.div
+            className="w-10 h-10 flex items-center justify-center text-2xl absolute z-30"
+            animate={{
+              left: LEVEL_POSITIONS[currentQuestionIndex].x,
+              top: LEVEL_POSITIONS[currentQuestionIndex].y,
+            }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            style={{ transform: 'translate(-50%, -50%)' }}
+          >
+            🐰
+          </motion.div>
+        )}
+
+        {!reading &&
+          LEVEL_POSITIONS.map((pos, idx) => (
+            <div
+              key={idx}
+              className={`absolute w-12 h-12 md:w-14 md:h-14 rounded-full border-4 flex items-center justify-center font-bold cursor-pointer shadow-lg text-lg z-20 ${
                 completedLevels.includes(idx)
                   ? 'bg-green-400 text-white border-green-500'
                   : 'bg-white border-orange-400'
               }`}
-            style={{ left: pos.x, top: pos.y }}
-            onClick={() => setCurrentQuestionIndex(idx)}
-          >
-            {idx + 1}
-          </div>
-        ))}
-
-      <AnimatePresence mode="wait">
-        {q && !reading && (
-          <motion.div
-            key={q.id}
-            className={`p-5 bg-white rounded-3xl shadow-2xl w-[90%] max-w-md text-center absolute left-1/2 -translate-x-1/2 bottom-10 z-40 ${
-              shake ? 'animate-shake' : ''
-            }`}
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          >
-            <p className="text-lg font-bold mb-4">{q.question}</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {q.options.map((o) => (
-                <button
-                  key={o}
-                  className="px-5 py-3 bg-gradient-to-r from-pink-400 to-pink-500 text-white rounded-2xl shadow hover:scale-105 transition-transform font-bold"
-                  onClick={() => handleAnswer(o, q, stories)}
-                >
-                  {o}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showConfetti &&
-          confettiParticles.map((c, i) => (
-            <motion.div
-              key={i}
-              className="absolute rounded-full"
               style={{
-                left: c.x,
-                top: c.y,
-                width: c.size,
-                height: c.size,
-                backgroundColor: c.color,
+                left: pos.x,
+                top: pos.y,
+                transform: 'translate(-50%, -50%)',
               }}
-              initial={{ y: c.y, rotate: c.rotate, opacity: 1 }}
-              animate={{
-                y: window.innerHeight + 50,
-                rotate: c.rotate + 360,
-                opacity: 1,
-              }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 2 + Math.random() }}
-            />
+              onClick={() => setCurrentQuestionIndex(idx)}
+            >
+              {idx + 1}
+            </div>
           ))}
-      </AnimatePresence>
 
-      <style jsx>{`
-        .animate-shake {
-          animation: shake 0.5s;
-        }
-        @keyframes shake {
-          0% {
-            transform: translateX(0);
+        <AnimatePresence mode="wait">
+          {q && !reading && (
+            <motion.div
+              key={q.id}
+              className={`p-5 bg-white rounded-3xl shadow-2xl w-[90%] max-w-md text-center absolute left-1/2 -translate-x-1/2 bottom-4 z-40 ${
+                shake ? 'animate-shake' : ''
+              }`}
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            >
+              <p className="text-lg font-bold mb-4">{q.question}</p>
+              <div className="flex flex-wrap justify-center gap-3">
+                {q.options.map((o) => (
+                  <button
+                    key={o}
+                    className="px-5 py-3 bg-gradient-to-r from-pink-400 to-pink-500 text-white rounded-2xl shadow hover:scale-105 transition-transform font-bold"
+                    onClick={() => handleAnswer(o, q, stories)}
+                  >
+                    {o}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showConfetti &&
+            confettiParticles.map((c, i) => (
+              <motion.div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  left: c.x,
+                  top: c.y,
+                  width: c.size,
+                  height: c.size,
+                  backgroundColor: c.color,
+                }}
+                initial={{ y: c.y, rotate: c.rotate, opacity: 1 }}
+                animate={{
+                  y: window.innerHeight + 50,
+                  rotate: c.rotate + 360,
+                  opacity: 1,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 2 + Math.random() }}
+              />
+            ))}
+        </AnimatePresence>
+
+        <style jsx>{`
+          .animate-shake {
+            animation: shake 0.5s;
           }
-          25% {
-            transform: translateX(-8px);
+          @keyframes shake {
+            0% {
+              transform: translateX(0);
+            }
+            25% {
+              transform: translateX(-8px);
+            }
+            50% {
+              transform: translateX(8px);
+            }
+            75% {
+              transform: translateX(-8px);
+            }
+            100% {
+              transform: translateX(0);
+            }
           }
-          50% {
-            transform: translateX(8px);
-          }
-          75% {
-            transform: translateX(-8px);
-          }
-          100% {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
+        `}</style>
+      </div>
     </div>
   )
 }
