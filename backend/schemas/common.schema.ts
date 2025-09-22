@@ -210,7 +210,6 @@ export const typeDefs = `
     
     generateQuestions(chapter: String!): [String!]!
     generateQuestionsWithContent(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int): GeneratedQuestions!
-<<<<<<< HEAD
     generateMCQQuestions(content: String!,   bookId: ID,  chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String, language: String): [Question!]!
     
 
@@ -222,9 +221,6 @@ export const typeDefs = `
     createQuestion( title: String!, text: String!, type: String!, question: String!, option: QuestionOptionsInput, createdBy: ID!, assignedTo: ID):Question!
 
     transcribeAudio(userId: ID!, bookId: ID!, audioBase64: String!): Transcription!
-=======
-    generateMCQQuestions(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String!, language: String): [Question!]!
->>>>>>> 3e18e56 (link)
     generateQuestionsFromText(title: String!, text: String!, maxQuestions: Int = 8): Question!
     
    
