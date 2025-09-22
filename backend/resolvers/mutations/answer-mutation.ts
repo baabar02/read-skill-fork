@@ -1,58 +1,63 @@
-import { Answer } from "../../models/answer-model";
+import { AnswerModel } from "../../models/answer-model";
 import { Question } from "../../models/question-model";
 
 export const submitAnswer = async (
   _: unknown,
   args: {
     questionId: string;
-    userId?: string;
     userAnswer: string;
-    bookId?: string;
-    chapterId?: string;
-  }
+    selectedOption?: string;
+    metadata?: {
+      timeSpent?: number;
+      attemptCount?: number;
+      difficulty?: string;
+      questionType?: string;
+    };
+  },
+  context: { userId: string }
 ) => {
   try {
-    const questionDoc = await Question.findById(args.questionId).exec();
-    if (!questionDoc) {
-      throw new Error("Question not found");
+    const { questionId, userAnswer, selectedOption, metadata } = args;
+    const { userId } = context;
+
+    // Question-г олох
+    const question = await Question.findById(questionId);
+    if (!question) {
+      throw new Error("Асуулт олдсонгүй");
     }
 
-    const question = questionDoc as any;
+    // Зөв хариулттай тулгах
+    const correctAnswer = question.questions?.[0]?.option?.correctAnswer;
+    const isCorrect =
+      userAnswer.toLowerCase().trim() === correctAnswer?.toLowerCase().trim();
 
-    const isCorrect = question.answer === args.userAnswer;
+    const option = question.questions?.[0]?.option;
 
-    const answer = new Answer({
-      questionId: args.questionId,
-      answer: args.userAnswer,
-      isCorrect: isCorrect,
+    // Option эсвэл correctAnswer байхгүй бол null эсвэл тохирсон утга буцаах
+    const safeOption = option && option.correctAnswer ? option : null;
+
+    const answer = new AnswerModel({
+      questionId,
+      userId,
+      answer: userAnswer,
+      isCorrect,
+      selectedOption,
+      option: safeOption,
+      answerMetadata: metadata
+        ? {
+            timeSpent: metadata.timeSpent || 0,
+            attemptCount: metadata.attemptCount || 1,
+            difficulty: metadata.difficulty,
+            questionType: metadata.questionType,
+          }
+        : undefined,
     });
 
     await answer.save();
 
-    let parsedOptions = question.option || null;
-  
-    let options = null;
-
-    if (parsedOptions && Array.isArray(parsedOptions.options)) {
-      options = {
-        options: parsedOptions.options,
-        explanation: parsedOptions.explanation || "",
-      };
-    }
-
-    return {
-      id: answer._id,
-      questionId: args.questionId,
-      userAnswer: args.userAnswer,
-      correctAnswer: question.answer,
-      isCorrect: isCorrect,
-      options: options,
-      explanation: parsedOptions?.explanation || "",
-    };
-
- 
+    return answer;
   } catch (error: any) {
-    console.error("Error submitting answer:", error);
-    throw new Error(error.message || "Failed to submit answer");
+    console.error("submitAnswer error:", error);
+    throw new Error(error.message || "Хариулт хадгалахад алдаа гарлаа");
   }
 };

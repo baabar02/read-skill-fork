@@ -49,9 +49,7 @@ export const userProgress = async (
       score,
       explanation: question.option?.explanation || "",
       userName,
-      
     };
-    
   } catch (error: any) {
     console.error("❌ UserProgress Error:", error);
     throw new Error(error.message);

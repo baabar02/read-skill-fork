@@ -36,15 +36,18 @@ type Question {
   id: ID!
   title: String!
   text: String!
-  type: QuestionType!          
+  type: QuestionType!
   question: String!
   option: QuestionOptions
   createdBy: ID!
   assignedTo: ID
   createdAt: String!
   updatedAt: String!
+  bookId: ID
+  chapterId: ID
+  answer: String
 }
-  enum QuestionType {
+enum QuestionType {
   mcq
   open
 }
@@ -115,7 +118,7 @@ type UserProgressResult {
   userName: String
 }
 
- input QuestionOptionsInput {
+input QuestionOptionsInput {
   options: [String!]!
   answer: String!
   explanation: String
@@ -178,6 +181,7 @@ type Mutation {
     difficulty: String
     numberOfQuestions: Int
     language: String
+    answer: String!
   ): [Question!]!
   submitAnswer(
     questionId: ID!
@@ -200,7 +204,7 @@ type Mutation {
 
   deleteBook(bookId: ID!): DeleteResponse!
 
-     createQuestion(
+  createQuestion(
     title: String!
     text: String!
     type: QuestionType!

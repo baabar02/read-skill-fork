@@ -1,12 +1,13 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { motion } from 'framer-motion'
-import Lottie from 'lottie-react'
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import Lottie from "lottie-react";
+import Link from "next/link";
 
-import Task from '@/assets/illustrations/task.json'
+import Task from "@/assets/illustrations/task.json";
 
 const HomeWork = () => {
   return (
@@ -36,18 +37,20 @@ const HomeWork = () => {
           </div>
 
           <div className="-mt-4 sm:-mt-3 w-[80%] flex justify-center">
-            <Button
-              size="lg"
-              variant="default"
-              className="w-[80%] py-8 text-m sm:text-xl font-semibold text-white rounded-full shadow-lg hover:scale-105 transition-transform"
-            >
-              Даалгавар хийх
-            </Button>
+            <Link href="/homework">
+              <Button
+                size="lg"
+                variant="default"
+                className="w-[80%] py-8 text-m sm:text-xl font-semibold text-white rounded-full shadow-lg hover:scale-105 transition-transform"
+              >
+                Даалгавар хийх
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
     </motion.div>
-  )
-}
+  );
+};
 
-export default HomeWork
+export default HomeWork;
