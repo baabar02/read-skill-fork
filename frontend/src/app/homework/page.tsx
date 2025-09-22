@@ -34,7 +34,7 @@ export default function HomeWorkPage() {
           <>
             <div className="flex items-center justify-center gap-3 mb-4">
               <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
-                Сайн байна уу
+                Сайн уу, найз аа
               </h1>
               <div className="w-16 h-16">
                 <Lottie animationData={RobotAnim} loop={true} />
@@ -42,7 +42,7 @@ export default function HomeWorkPage() {
             </div>
 
             <p className="text-lg md:text-xl text-gray-200 mb-8">
-              Эхийг сайн ойлгож уншаарай
+              Даалгаварт нь амжилт хүсье
             </p>
 
             <button
