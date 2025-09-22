@@ -51,6 +51,9 @@ type Question {
   assignedTo: ID
   createdAt: String!
   updatedAt: String!
+    bookId: ID
+  chapterId: ID
+  answer: String
 }
   enum QuestionType {
   mcq
@@ -59,8 +62,8 @@ type Question {
 
 type Answer {
   id: ID!
-  bookId: ID!
-  chapterId: ID!
+  bookId: ID
+  chapterId: ID
   questionId: ID!
   userId: String!
   answer: String!
@@ -161,7 +164,7 @@ type UserScore {
     addContent(bookId:ID!, title:String, content:[String], audio_url:String): Chapter!
     generateQuestions(chapter: String!): [String!]!
     generateQuestionsWithContent(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int): GeneratedQuestions!
-    generateMCQQuestions(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int, language: String): [Question!]!
+    generateMCQQuestions(content: String!,   bookId: ID  chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String, language: String): [Question!]!
     submitAnswer(questionId: ID!, userAnswer: String!, bookId: ID, chapterId: ID): AnswerResult!
 
     userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!, timeAnswer:Int!):UserProgressResponse

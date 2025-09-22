@@ -6,8 +6,8 @@
       "dependencies": {
         "@apollo/server": "^5.0.0",
         "@dotenvx/dotenvx": "^1.49.0",
-        "@types/jsonwebtoken": "^9.0.10",
         "@google/generative-ai": "^0.24.1",
+        "@types/jsonwebtoken": "^9.0.10",
         "apollo-server-errors": "^3.3.1",
         "cors": "^2.8.5",
         "express": "^5.1.0",
