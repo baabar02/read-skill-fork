@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Brain, CheckCircle } from "lucide-react";
 
 // GraphQL imports
-import { GenerateQuestionsDocument } from "../../../../graphql/generated";
+import { GenerateMcqQuestionsDocument } from "../../../../graphql/generated";
 
 export default function SimpleQuestionGenerator() {
   const [content, setContent] = useState("");
@@ -18,7 +18,7 @@ export default function SimpleQuestionGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [generateQuestions] = useMutation(GenerateQuestionsDocument);
+  const [generateQuestions] = useMutation(GenerateMcqQuestionsDocument);
 
   const handleGenerate = async () => {
     if (!content.trim()) {
