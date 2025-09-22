@@ -1,4 +1,4 @@
-import { Answer } from "../../models/answer-model";
+import { AnswerModel } from "../../models/answer-model";
 
 export const getUserAnswers = async (
   _: unknown,
@@ -17,7 +17,7 @@ export const getUserAnswers = async (
       query.chapterId = args.chapterId;
     }
 
-    const answers = await (Answer as any)
+    const answers = await (AnswerModel as any)
       .find(query)
       .populate("questionId")
       .populate("bookId")

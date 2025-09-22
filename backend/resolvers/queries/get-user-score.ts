@@ -1,5 +1,4 @@
-import { Answer } from "../../models/answer-model";
-
+import { AnswerModel } from "../../models/answer-model";
 
 export const getUserScore = async (
   _: unknown,
@@ -18,7 +17,7 @@ export const getUserScore = async (
       query.chapterId = args.chapterId;
     }
 
-    const answers = await (Answer as any).find(query);
+    const answers = await (AnswerModel as any).find(query);
 
     const totalQuestions = answers.length;
     const correctAnswers = answers.filter(
