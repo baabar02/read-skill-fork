@@ -53,8 +53,8 @@ export const typeDefs = `
     text: String!
     questions: [GeneratedQuestion!]!
     option: QuestionOption
-    createdAt: String
-    updatedAt: String
+    createdAt: String!
+    updatedAt: String!
   }
 
   # ШИНЭ: AI Analysis Types
@@ -170,7 +170,7 @@ export const typeDefs = `
     getUserLearningStats(userId: ID!): UserLearningStats!
     getSkillAnalysis(userId: ID!, skill: String): [SkillAssessment!]!
     getUserAIAnalysis(userId: ID!): AIAnalysis
-    _dummy: String
+    
   }
 
   type UserProgressResponse {
@@ -210,8 +210,8 @@ export const typeDefs = `
     
     generateQuestions(chapter: String!): [String!]!
     generateQuestionsWithContent(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int): GeneratedQuestions!
-    generateMCQQuestions(content: String!,   bookId: ID  chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String, language: String): [Question!]!
-    submitAnswer(questionId: ID!, userAnswer: String!, bookId: ID, chapterId: ID): AnswerResult!
+    generateMCQQuestions(content: String!,   bookId: ID,  chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String, language: String): [Question!]!
+    
 
     userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!, timeAnswer:Int!):UserProgressResponse
    
@@ -227,7 +227,7 @@ export const typeDefs = `
   
     
  
-    submitAnswer(questionId: ID!userAnswer: String!selectedOption: Stringmetadata: AnswerMetadataInput): Answer!
+    submitAnswer(questionId: ID!, userAnswer: String!, selectedOption: String, metadata: AnswerMetadataInput): Answer!
     
    
     
