@@ -1,34 +1,39 @@
-import { model, models, Schema, Document } from "mongoose";
+import { model, Schema, Document } from "mongoose";
 
 interface QuestionOption {
   options: string[];
   explanation: string;
+  correctAnswer: string;
 }
 
-export interface Question extends Document {
-  _id: Schema.Types.ObjectId;
-  chapterId?: Schema.Types.ObjectId;
-  bookId?: Schema.Types.ObjectId;
+interface GeneratedQuestion {
   question: string;
-  answer: string;
-  option?: QuestionOption;
+  option: QuestionOption;
 }
 
-const questionSchema = new Schema<Question>(
+export interface QuestionDoc extends Document {
+  _id: Schema.Types.ObjectId;
+  title: string;
+  text: string;
+  questions: GeneratedQuestion[];
+}
+
+const questionSchema = new Schema<QuestionDoc>(
   {
-    chapterId: { type: Schema.Types.ObjectId, required: false, ref: "Chapter" },
-    bookId: { type: Schema.Types.ObjectId, required: false, ref: "Book" },
-    question: { type: String, required: true },
-    answer: { type: String, required: true },
-    option: {
-      type: {
-        options: [{ type: String, required: true }],
-        explanation: { type: String, required: true },
+    title: { type: String, required: true },
+    text: { type: String, required: true },
+    questions: [
+      {
+        question: { type: String, required: true },
+        option: {
+          options: [{ type: String, required: true }],
+          explanation: { type: String, required: true },
+          correctAnswer: { type: String, required: true },
+        },
       },
-      required: false,
-    },
+    ],
   },
   { timestamps: true }
 );
 
-export const Question = model<Question>("Question", questionSchema);
+export const Question = model<QuestionDoc>("Question", questionSchema);
