@@ -1,140 +1,257 @@
-import { QuestionModel } from "../../models/text-model";
-import { Types } from "mongoose";
+import { Question } from "../../models/question-model";
 import { OpenAI } from "openai";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export const createQuestion = async (
+const parseJsonFromText = (text: string) => {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start !== -1 && end !== -1) {
+    try {
+      return JSON.parse(text.slice(start, end + 1));
+    } catch {}
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("AI response parsing failed");
+  }
+};
+
+export const generateQuestionsFromText = async (
   _: unknown,
-  {
-    title,
-    text,
-    type,
-    question,
-    option,
-    createdBy,
-    assignedTo,
-  }: {
+  args: {
     title: string;
     text: string;
-    type: "mcq" | "open";
-    question?: string;
-    option?: {
-      options: string[];
-      answer: string;
-      explanation?: string;
-    };
-    createdBy: string;
-    assignedTo?: string;
+    maxQuestions?: number;
   }
 ) => {
   try {
-    // Input validation
-    if (!title?.trim() || !text?.trim()) {
-      throw new Error("Title болон текст хоосон байна");
-    }
-
-    if (!type || !["mcq", "open"].includes(type)) {
-      throw new Error("Type заавал 'mcq' эсвэл 'open' байх ёстой");
-    }
-
-    let finalQuestion = question?.trim();
-    let finalOption = option;
-
-    // AI-ээр асуулт үүсгэх
-    if (!finalQuestion) {
-      console.log("No question provided, generating with AI...");
-
-      const completion = await client.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `
-Чи боловсролын салбарын AI туслах. Өгөгдсөн текст дээр үндэслэн ${
-              type === "mcq" ? "MCQ" : "нээлттэй"
-            } асуулт үүсгэ.
-
-ЗӨВХӨН дараах JSON форматыг буцаах:
-{
-  "question": "Асуулт текст"${
-    type === "mcq"
-      ? ',\n  "options": ["option1","option2","option3","option4"],\n  "answer": "Зөв хариулт"'
-      : ""
-  }
-}
-            `,
-          },
-          { role: "user", content: `Title: ${title}\nText: ${text}` },
-        ],
-      });
-
-      const aiResponse = completion.choices[0]?.message?.content;
-      if (!aiResponse) throw new Error("AI-гаас хоосон хариу ирсэн байна");
-
-      try {
-        const cleanResponse = aiResponse.replace(/```json\n?|```\n?/g, "").trim();
-        const parsed = JSON.parse(cleanResponse);
-
-        finalQuestion = parsed.question;
-        if (type === "mcq" && parsed.options && parsed.answer) {
-          finalOption = {
-            options: parsed.options,
-            answer: parsed.answer,
-            explanation: parsed.explanation || "",
-          };
-        }
-      } catch (parseError) {
-        console.error("AI JSON Parse Error:", parseError);
-        finalQuestion = aiResponse;
-      }
-    }
-
-    if (!finalQuestion?.trim()) {
-      throw new Error("Асуулт үүсгэж чадсангүй");
-    }
-
-    if (type === "mcq" && (!finalOption || !finalOption.options || !finalOption.answer)) {
-      throw new Error("MCQ асуултад options болон answer заавал байх ёстой");
-    }
-
-    // MongoDB-д хадгалах объект
-    const newQ = new QuestionModel({
-      title: title.trim(),
-      text: text.trim(),
-      type,
-      question: finalQuestion.trim(),
-      option:
-        type === "mcq" && finalOption
-          ? {
-              options: finalOption.options,
-              answer: finalOption.answer,
-              explanation: finalOption.explanation || "",
-            }
-          : undefined,
-      createdBy: new Types.ObjectId(createdBy),
-      assignedTo: assignedTo ? new Types.ObjectId(assignedTo) : undefined,
+    // Args-аас утгуудыг задлах
+    const { title, text, maxQuestions = 8 } = args;
+    
+    // Debug мэдээлэл
+    console.log("generateQuestionsFromText called with:", {
+      title: typeof title,
+      text: typeof text,
+      maxQuestions,
+      titleValue: title,
+      textValue: text
     });
 
-    const savedQuestion = await newQ.save();
+    // Input validation
+    if (!title || typeof title !== 'string') {
+      throw new Error("Title заавал string байх ёстой");
+    }
+    
+    if (!text || typeof text !== 'string') {
+      throw new Error("Text заавал string байх ёстой");
+    }
 
-  
-    const questionObj = savedQuestion.toObject(); 
+    const prompt = `
+Чи бол уншлагын ойлголт болон танин мэдэхүйн шалгалтын асуулт зохиодог туслах. Доорх текстээс 4 төрлийн ур чадварыг шалгах асуултууд үүсгэнэ.
 
-    return {
-       id: (questionObj._id as Types.ObjectId).toString(),
-      title: questionObj.title,
-      text: questionObj.text,
-      type: questionObj.type,
-      question: questionObj.question,
-      option: questionObj.option,
-      createdBy: questionObj.createdBy.toString(),
-      assignedTo: questionObj.assignedTo?.toString() || null,
-    //   createdAt: questionObj.createdAt.toISOString(),
-    //   updatedAt: questionObj.updatedAt.toISOString(),
-    };
-  } catch (error: any) {
-    console.error("Create Question Error:", error);
-    throw new Error(error.message || "Асуулт үүсгэхэд алдаа гарлаа");
+Өгөгдсөн текст: "${text}"
+
+ЗӨВХӨН дараах JSON форматыг буцаа:
+
+{
+  "questions": [
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Танин мэдэхүй",
+      "subSkill": "Үг таних",
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Яагаад энэ хариулт зөв болохыг тайлбарлана"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Танин мэдэхүй",
+      "subSkill": "Ой тогтоолт",
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт", 
+        "explanation": "Тайлбар"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Танин мэдэхүй",
+      "subSkill": "Гол санаа олох",
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Тайлбар"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Сэтгэн бодох",
+      "subSkill": "Шалтгаан–үр дагавар",
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Тайлбар"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Сэтгэн бодох", 
+      "subSkill": "Төсөөлөл",
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Тайлбар"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Харилцаа",
+      "subSkill": "Үгийн баялаг", 
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Тайлбар"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Сэтгэл хөдлөл ба нийгмийн",
+      "subSkill": "Сэтгэл хөдлөлийг ойлгох",
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"], 
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Тайлбар"
+      }
+    }
+  ]
+}
+
+ШААРДЛАГА:
+- Бүх асуулт текстын агуулгатай холбоотой байх
+- 3 сонголттой, зөвхөн 1 зөв хариулт
+- Сонголтууд бүгд боломжит мэт харагдах
+- Тайлбар товч, ойлгомжтой байх
+- Зөвхөн JSON буцаа, өөр текст битгий нэм
+    `;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { 
+          role: "system", 
+          content: "You must return ONLY valid JSON format. No explanations, no markdown, no extra text." 
+        },
+        { role: "user", content: prompt },
+      ],
+      max_tokens: 1000,
+      temperature: 0.1,
+    });
+
+    const aiText = response.choices?.[0]?.message?.content ?? "";
+    if (!aiText) throw new Error("Empty AI response");
+
+    console.log("AI Response RAW:", aiText);
+    console.log("AI Response length:", aiText.length);
+
+    try {
+      const parsed = parseJsonFromText(aiText);
+      console.log("Parsed successfully:", parsed);
+      
+      if (!parsed?.questions || !Array.isArray(parsed.questions)) {
+        throw new Error("AI did not return questions array.");
+      }
+
+      const questions = parsed.questions.slice(0, maxQuestions).map((q: any) => ({
+        question: String(q.question || "").trim(),
+        option: {
+          options: (q.option?.options || []).map((o: any) => String(o).trim()),
+          explanation: String(q.option?.explanation || "").trim(),
+          correctAnswer: String(q.option?.correctAnswer || "").trim(),
+        },
+      }));
+
+      // Хадгалахын өмнө утгуудыг шалгах
+      console.log("Before saving to DB:", {
+        title: title.trim(),
+        text: text.trim(),
+        questionsLength: questions.length
+      });
+
+      const doc = new Question({
+        title: title.trim(),
+        text: text.trim(),
+        questions,
+      });
+
+      await doc.save();
+      
+      console.log("Saved document:", {
+        id: doc._id,
+        title: doc.title,
+        text: doc.text,
+        questionsCount: doc.questions.length
+      });
+      
+      return doc;
+      
+    } catch (parseError) {
+      console.error("Parse error details:", parseError);
+      console.log("Attempting manual JSON extraction...");
+      
+      // Manual JSON extraction attempt
+      const lines = aiText.split('\n');
+      let jsonStart = -1;
+      let jsonEnd = -1;
+      
+      // for (let i = 0; i < lines.length; i++) {
+      //   if (lines[i].includes('{') && jsonStart === -1) {
+      //     jsonStart = i;
+      //   }
+      //   if (lines[i].includes('}') && jsonStart !== -1) {
+      //     jsonEnd = i;
+      //   }
+      // }
+      
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        const jsonText = lines.slice(jsonStart, jsonEnd + 1).join('\n');
+        console.log("Extracted JSON:", jsonText);
+        try {
+          const manualParsed = JSON.parse(jsonText);
+          console.log("Manual parse successful:", manualParsed);
+          
+          // Manual parse амжилттай бол үргэлжлүүлэх
+          if (manualParsed && manualParsed.questions && Array.isArray(manualParsed.questions)) {
+            const questions = manualParsed.questions.slice(0, maxQuestions).map((q: any) => ({
+              question: String(q.question || "").trim(),
+              option: {
+                options: (q.option?.options || []).map((o: any) => String(o).trim()),
+                explanation: String(q.option?.explanation || "").trim(),
+                correctAnswer: String(q.option?.correctAnswer || "").trim(),
+              },
+            }));
+
+            const doc = new Question({
+              title: title.trim(),
+              text: text.trim(),
+              questions,
+            });
+
+            await doc.save();
+            return doc;
+          }
+        } catch (manualError) {
+          console.error("Manual parse also failed:", manualError);
+        }
+      }
+      
+      throw new Error("AI response parsing failed");
+    }
+  } catch (err: any) {
+    console.error("generateQuestionsFromText error:", err);
+    throw new Error(err.message || "Internal server error");
   }
 };
