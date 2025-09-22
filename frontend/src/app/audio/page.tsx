@@ -81,7 +81,7 @@ export default function TranscriptionPage() {
             const { data } = await transcribeAudio({
               variables: {
                 userId: "68c7a0a49f6ae7515b7f0508",
-                bookId: "68ca2beaf89531d138362e16",
+                bookId: "68c7a4a33571925f591602ea",
                 audioBase64: base64data,
               },
             });
