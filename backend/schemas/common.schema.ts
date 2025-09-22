@@ -130,15 +130,12 @@ type UserScore {
     getBookById(bookId:ID!): Book!
     getUserProgress(userId:ID!): [UserProgressResponse]
     getUserById(userId:ID!) : User!
-<<<<<<< HEAD
 
     getTranscriptions(userId: ID!): [Transcription]!
     getTranscription(id: ID!): Transcription
-=======
   questions: [Question!]!
   question(id: ID!): Question
    _dummy: String
->>>>>>> ac52d9b (question)
   }
 
  type UserProgressResponse {
@@ -174,12 +171,9 @@ type UserScore {
     deleteBook(bookId: ID!): DeleteResponse!
 
     updateBook(  bookId: ID!, title: String, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]) : Book!
-<<<<<<< HEAD
     createQuestion( title: String!, text: String!, type: String!, question: String!, option: QuestionOptionsInput, createdBy: ID!, assignedTo: ID):Question!
 
     transcribeAudio(userId: ID!, bookId: ID!, audioBase64: String!): Transcription!
-=======
     generateQuestionsFromText(title: String!, text: String!, maxQuestions: Int = 8): Question!
->>>>>>> ac52d9b (question)
   }
 `;
