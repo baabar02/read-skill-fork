@@ -1,54 +1,52 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
+import Lottie from 'lottie-react'
+
+import Task from '@/assets/illustrations/task.json'
 
 const HomeWork = () => {
-  const weekDays = [
-    { day: 'Даваа', task: 'Даалгавар: Уншиж ойлгох' },
-    { day: 'Мягмар', task: null },
-    { day: 'Лхагва', task: null },
-    { day: 'Пүрэв', task: null },
-    { day: 'Баасан', task: null },
-    { day: 'Бямба', task: null },
-    { day: 'Ням', task: null },
-  ]
-
-  const [selectedDay, setSelectedDay] = useState<string | null>('Даваа')
-
   return (
-    <Card className="w-full max-w-xl h-[32rem] mx-auto bg-white/40 backdrop-blur-md border border-gray-200 shadow-lg flex flex-col justify-between p-6">
-      <CardHeader>
-        <CardTitle className="text-2xl md:text-3xl lg:text-4xl text-center">
-          Гэрийн даалгавар
-        </CardTitle>
-      </CardHeader>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-xl mx-auto p-4"
+    >
+      <Card className="w-full max-w-xl h-[32rem] mx-auto bg-white/40 backdrop-blur-md border border-gray-200 shadow-lg flex flex-col justify-between p-6 rounded-full">
+        <CardHeader className="flex flex-col items-center">
+          <div className="text-black px-6 py-2 rounded-full shadow-md">
+            <CardTitle className="text-2xl md:text-3xl lg:text-4xl text-center">
+              Багшаас ирсэн даалгавар
+            </CardTitle>
+          </div>
+        </CardHeader>
 
-      <CardContent className="flex flex-col gap-6 flex-1">
-        <div className="flex flex-wrap justify-center gap-2">
-          {weekDays.map((day) => (
+        <CardContent className="flex flex-col gap-6 flex-1 items-center justify-center">
+          <div className="mt-4 text-center text-gray-700 text-lg md:text-xl lg:text-2xl flex flex-col items-center gap-4">
+            <Lottie
+              animationData={Task}
+              loop
+              autoplay
+              style={{ width: 250, height: 250 }}
+            />
+          </div>
+
+          <div className="-mt-4 sm:-mt-3 w-[80%] flex justify-center">
             <Button
-              key={day.day}
-              size="sm"
-              variant={selectedDay === day.day ? 'default' : 'outline'}
-              onClick={() => setSelectedDay(day.day)}
+              size="lg"
+              variant="default"
+              className="w-[80%] py-8 text-m sm:text-xl font-semibold text-white rounded-full shadow-lg hover:scale-105 transition-transform"
             >
-              {day.day}
+              Даалгавар хийх
             </Button>
-          ))}
-        </div>
-        <div className="mt-4 text-center text-gray-700 text-lg md:text-xl lg:text-2xl flex-1 flex items-center justify-center">
-          {weekDays.find((d) => d.day === selectedDay)?.task ||
-            'Өнөөдөр даалгавар байхгүй'}
-        </div>
-        <div className="mt-4 w-full">
-          <Button size="lg" variant="default" className="w-full">
-            Даалгавар хийх
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }
 
