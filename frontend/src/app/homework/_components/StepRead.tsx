@@ -1,15 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useLatestQuestionQuery } from "../../../../graphql/generated";
 
 interface StepReadProps {
   onFinish: () => void;
 }
 
 export default function StepRead({ onFinish }: StepReadProps) {
-  const [counter, setCounter] = useState(3); // Tailbar 5 секунд
+  const [counter, setCounter] = useState(5); // Tailbar 5 секунд (өөрчилсөн)
   const [showStory, setShowStory] = useState(false);
-  const [minutes, setMinutes] = useState(0); // Үлгэр унших минут
-  const [seconds, setSeconds] = useState(0); // Үлгэр унших секунд
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+
+  const { data, loading, error } = useLatestQuestionQuery();
+
+  useEffect(() => {
+    if (data?.latestQuestion?._id) {
+      localStorage.setItem("latestStoryId", data.latestQuestion._id);
+    }
+  }, [data]);
 
   // Tailbar countdown
   useEffect(() => {
@@ -38,7 +47,9 @@ export default function StepRead({ onFinish }: StepReadProps) {
     }
   }, [showStory]);
 
-  // Tailbar буюу эхлэхээс өмнөх анхааруулга
+  if (loading) return <p>Ачааллаж байна...</p>;
+  if (error) return <p>Алдаа гарлаа: {error.message}</p>;
+
   if (!showStory) {
     return (
       <div className="max-w-2xl bg-gradient-to-r from-blue-50 to-indigo-50/80 rounded-3xl p-8 shadow-2xl text-center flex flex-col items-center gap-6">
@@ -59,10 +70,9 @@ export default function StepRead({ onFinish }: StepReadProps) {
         {seconds.toString().padStart(2, "0")}
       </div>
 
-      <p className="text-lg md:text-xl text-gray-900 leading-relaxed">
-        Нэгэн цагт алс холын нутагт ухаантай жижигхэн хулгана амьдардаг байжээ.
-        Тэр өдөр бүр шинэ зүйлс сурч, найзуудтайгаа тоглож, амьдралаа хөгжилтэй
-        өнгөрүүлдэг байв.
+      {/* GraphQL-с ирсэн өгүүллэг */}
+      <p className="text-lg md:text-xl text-gray-900 leading-relaxed whitespace-pre-wrap">
+        {data?.latestQuestion?.text || "Үлгэр олдсонгүй."}
       </p>
 
       <button

@@ -1,0 +1,21 @@
+mutation GenerateUserAnalysis($userId: ID!) {
+  generateUserAnalysis(userId: $userId) {
+    analysis {
+      overallScore
+      skillAssessments {
+        skill
+        subSkill
+        score
+        level
+        feedback
+      }
+      strengths
+      improvements
+      recommendations
+      analysisDate
+      confidence
+    }
+    message
+    success
+  }
+}

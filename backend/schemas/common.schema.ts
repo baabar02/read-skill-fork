@@ -42,8 +42,8 @@ export const typeDefs = `
 
   type GeneratedQuestion {
     question: String!
-    skill: String!        
-    subSkill: String!    
+    skill: String  
+    subSkill: String  
     option: QuestionOption!
   }
 
@@ -57,7 +57,7 @@ export const typeDefs = `
     updatedAt: String!
   }
 
-  # ШИНЭ: AI Analysis Types
+ 
   type SkillAssessment {
     skill: String!
     subSkill: String!
@@ -84,7 +84,7 @@ export const typeDefs = `
   }
     
   type Answer {
-    id: ID!
+    _id: ID!
     questionId: ID!
     userId: String!
     answer: String!
@@ -157,8 +157,8 @@ export const typeDefs = `
     getUsers: [User!]!
     getUserAnswers(userId: ID!): [Answer!]!
     getUserById(userId: ID!): User!
-    getBooks: [Book!]! 
-   _dummy: String
+    getBooks: [Book!]!
+   latestQuestion: Question
     getBookById(bookId: ID!): Book!
     getUserProgress(userId: ID!): [UserProgressResponse]
     getTranscriptions(userId: ID!): [Transcription]!
@@ -210,6 +210,7 @@ export const typeDefs = `
     
     generateQuestions(chapter: String!): [String!]!
     generateQuestionsWithContent(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int): GeneratedQuestions!
+<<<<<<< HEAD
     generateMCQQuestions(content: String!,   bookId: ID,  chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String, language: String): [Question!]!
     
 
@@ -221,6 +222,9 @@ export const typeDefs = `
     createQuestion( title: String!, text: String!, type: String!, question: String!, option: QuestionOptionsInput, createdBy: ID!, assignedTo: ID):Question!
 
     transcribeAudio(userId: ID!, bookId: ID!, audioBase64: String!): Transcription!
+=======
+    generateMCQQuestions(content: String!, bookId: ID, chapterId: ID, difficulty: String, numberOfQuestions: Int, answer: String!, language: String): [Question!]!
+>>>>>>> 3e18e56 (link)
     generateQuestionsFromText(title: String!, text: String!, maxQuestions: Int = 8): Question!
     
    

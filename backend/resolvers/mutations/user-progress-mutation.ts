@@ -18,8 +18,8 @@ export const userProgress = async (
     const question = await Question.findById(args.questionId);
     if (!question) throw new Error("Асуулт олдсонгүй");
 
-    const isCorrect = question.answer === args.answer;
-    const score = isCorrect ? 1 : 0;
+    // const isCorrect = question.answer === args.answer;
+    // const score = isCorrect ? 1 : 0;
 
     let userName = "Unknown";
     if (args.userId) {
@@ -34,9 +34,9 @@ export const userProgress = async (
       chapterId: args.chapterId,
       questionId: args.questionId,
       answer: args.answer,
-      score: score,
+      // score: score,
       completed: true,
-      isCorrect: isCorrect,
+      // isCorrect: isCorrect,
       timeDuration: args.timeDuration,
       timeAnswer: args.timeAnswer,
     });
@@ -45,9 +45,9 @@ export const userProgress = async (
 
     return {
       success: true,
-      isCorrect,
-      score,
-      explanation: question.option?.explanation || "",
+      // isCorrect,
+      // score,
+      // explanation: question.option?.explanation || "",
       userName,
     };
   } catch (error: any) {

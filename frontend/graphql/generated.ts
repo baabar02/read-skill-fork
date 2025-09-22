@@ -17,17 +17,52 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type AiAnalysis = {
+  __typename?: 'AIAnalysis';
+  analysisDate: Scalars['String']['output'];
+  confidence: Scalars['Float']['output'];
+  improvements: Array<Scalars['String']['output']>;
+  overallScore: Scalars['Int']['output'];
+  recommendations: Array<Scalars['String']['output']>;
+  skillAssessments: Array<SkillAssessment>;
+  strengths: Array<Scalars['String']['output']>;
+};
+
+export type AnalysisResponse = {
+  __typename?: 'AnalysisResponse';
+  analysis?: Maybe<AiAnalysis>;
+  message: Scalars['String']['output'];
+  success: Scalars['Boolean']['output'];
+};
+
 export type Answer = {
   __typename?: 'Answer';
+  _id: Scalars['ID']['output'];
+  aiAnalysis?: Maybe<AiAnalysis>;
   answer: Scalars['String']['output'];
-  bookId: Scalars['ID']['output'];
-  chapterId: Scalars['ID']['output'];
+  answerMetadata?: Maybe<AnswerMetadata>;
   createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
   isCorrect: Scalars['Boolean']['output'];
+  option?: Maybe<QuestionOption>;
   questionId: Scalars['ID']['output'];
+  selectedOption?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['String']['output'];
-  userId: Scalars['ID']['output'];
+  userId: Scalars['String']['output'];
+};
+
+export type AnswerMetadata = {
+  __typename?: 'AnswerMetadata';
+  attemptCount?: Maybe<Scalars['Int']['output']>;
+  difficulty?: Maybe<Scalars['String']['output']>;
+  questionType?: Maybe<Scalars['String']['output']>;
+  timeSpent?: Maybe<Scalars['Int']['output']>;
+};
+
+export type AnswerMetadataInput = {
+  attemptCount?: InputMaybe<Scalars['Int']['input']>;
+  difficulty?: InputMaybe<Scalars['String']['input']>;
+  questionType?: InputMaybe<Scalars['String']['input']>;
+  timeSpent?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type AnswerResult = {
@@ -80,6 +115,14 @@ export type DeleteResponse = {
   success: Scalars['Boolean']['output'];
 };
 
+export type GeneratedQuestion = {
+  __typename?: 'GeneratedQuestion';
+  option: QuestionOption;
+  question: Scalars['String']['output'];
+  skill: Scalars['String']['output'];
+  subSkill: Scalars['String']['output'];
+};
+
 export type GeneratedQuestions = {
   __typename?: 'GeneratedQuestions';
   bookId?: Maybe<Scalars['ID']['output']>;
@@ -94,15 +137,21 @@ export type Mutation = {
   __typename?: 'Mutation';
   addBook: Book;
   addContent: Chapter;
+  createQuestion: Question;
   createUser: AuthPayload;
   deleteBook: DeleteResponse;
   generateMCQQuestions: Array<Question>;
   generateQuestions: Array<Scalars['String']['output']>;
+  generateQuestionsFromText: Question;
   generateQuestionsWithContent: GeneratedQuestions;
+  generateUserAnalysis: AnalysisResponse;
   loginUser: AuthPayload;
-  submitAnswer: AnswerResult;
+  requestSkillAssessment: AnalysisResponse;
+  submitAnswer: Answer;
+  transcribeAudio: Transcription;
   updateBook: Book;
-  userProgress?: Maybe<UserProgressResult>;
+  updateLearningGoals: Scalars['Boolean']['output'];
+  userProgress?: Maybe<UserProgressResponse>;
 };
 
 
@@ -125,6 +174,17 @@ export type MutationAddContentArgs = {
 };
 
 
+export type MutationCreateQuestionArgs = {
+  assignedTo?: InputMaybe<Scalars['ID']['input']>;
+  createdBy: Scalars['ID']['input'];
+  option?: InputMaybe<QuestionOptionsInput>;
+  question: Scalars['String']['input'];
+  text: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
+
 export type MutationCreateUserArgs = {
   name: Scalars['String']['input'];
 };
@@ -136,6 +196,7 @@ export type MutationDeleteBookArgs = {
 
 
 export type MutationGenerateMcqQuestionsArgs = {
+  answer: Scalars['String']['input'];
   bookId?: InputMaybe<Scalars['ID']['input']>;
   chapterId?: InputMaybe<Scalars['ID']['input']>;
   content: Scalars['String']['input'];
@@ -150,6 +211,13 @@ export type MutationGenerateQuestionsArgs = {
 };
 
 
+export type MutationGenerateQuestionsFromTextArgs = {
+  maxQuestions?: InputMaybe<Scalars['Int']['input']>;
+  text: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+};
+
+
 export type MutationGenerateQuestionsWithContentArgs = {
   bookId?: InputMaybe<Scalars['ID']['input']>;
   chapterId?: InputMaybe<Scalars['ID']['input']>;
@@ -159,16 +227,34 @@ export type MutationGenerateQuestionsWithContentArgs = {
 };
 
 
+export type MutationGenerateUserAnalysisArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationLoginUserArgs = {
   name: Scalars['String']['input'];
 };
 
 
+export type MutationRequestSkillAssessmentArgs = {
+  skills?: InputMaybe<Array<Scalars['String']['input']>>;
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationSubmitAnswerArgs = {
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
+  metadata?: InputMaybe<AnswerMetadataInput>;
   questionId: Scalars['ID']['input'];
+  selectedOption?: InputMaybe<Scalars['String']['input']>;
   userAnswer: Scalars['String']['input'];
+};
+
+
+export type MutationTranscribeAudioArgs = {
+  audioBase64: Scalars['String']['input'];
+  bookId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -184,8 +270,16 @@ export type MutationUpdateBookArgs = {
 };
 
 
+export type MutationUpdateLearningGoalsArgs = {
+  goals: Array<Scalars['String']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationUserProgressArgs = {
   answer: Scalars['String']['input'];
+  bookId?: InputMaybe<Scalars['ID']['input']>;
+  chapterId?: InputMaybe<Scalars['ID']['input']>;
   questionId: Scalars['ID']['input'];
   timeAnswer: Scalars['Int']['input'];
   timeDuration: Scalars['Int']['input'];
@@ -194,14 +288,21 @@ export type MutationUserProgressArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  _dummy?: Maybe<Scalars['String']['output']>;
   getBookById: Book;
   getBooks: Array<Book>;
-  getQuestionsForBook: Array<Question>;
+  getSkillAnalysis: Array<SkillAssessment>;
+  getTranscription?: Maybe<Transcription>;
+  getTranscriptions: Array<Maybe<Transcription>>;
+  getUserAIAnalysis?: Maybe<AiAnalysis>;
   getUserAnswers: Array<Answer>;
   getUserById: User;
-  getUserProgress: Array<UserProgress>;
-  getUserScore: UserScore;
+  getUserLearningStats: UserLearningStats;
+  getUserProgress?: Maybe<Array<Maybe<UserProgressResponse>>>;
   getUsers: Array<User>;
+  latestQuestion?: Maybe<Question>;
+  question?: Maybe<Question>;
+  questions: Array<Question>;
 };
 
 
@@ -210,15 +311,28 @@ export type QueryGetBookByIdArgs = {
 };
 
 
-export type QueryGetQuestionsForBookArgs = {
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
+export type QueryGetSkillAnalysisArgs = {
+  skill?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetTranscriptionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetTranscriptionsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryGetUserAiAnalysisArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
 export type QueryGetUserAnswersArgs = {
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
   userId: Scalars['ID']['input'];
 };
 
@@ -228,33 +342,81 @@ export type QueryGetUserByIdArgs = {
 };
 
 
+export type QueryGetUserLearningStatsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type QueryGetUserProgressArgs = {
   userId: Scalars['ID']['input'];
 };
 
 
-export type QueryGetUserScoreArgs = {
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
-  userId: Scalars['ID']['input'];
+export type QueryQuestionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type Question = {
   __typename?: 'Question';
-  answer: Scalars['String']['output'];
-  bookId: Scalars['ID']['output'];
-  chapterId?: Maybe<Scalars['ID']['output']>;
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  option?: Maybe<QuestionOptions>;
-  question: Scalars['String']['output'];
-  updatedAt: Scalars['String']['output'];
+  _id: Scalars['ID']['output'];
+  createdAt?: Maybe<Scalars['String']['output']>;
+  option?: Maybe<QuestionOption>;
+  questions: Array<GeneratedQuestion>;
+  text: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['String']['output']>;
+};
+
+export type QuestionOption = {
+  __typename?: 'QuestionOption';
+  correctAnswer: Scalars['String']['output'];
+  explanation: Scalars['String']['output'];
+  options: Array<Scalars['String']['output']>;
 };
 
 export type QuestionOptions = {
   __typename?: 'QuestionOptions';
   explanation: Scalars['String']['output'];
   options: Array<Scalars['String']['output']>;
+};
+
+export type QuestionOptionsInput = {
+  answer: Scalars['String']['input'];
+  explanation?: InputMaybe<Scalars['String']['input']>;
+  options: Array<Scalars['String']['input']>;
+};
+
+export type SkillAssessment = {
+  __typename?: 'SkillAssessment';
+  feedback: Scalars['String']['output'];
+  level: Scalars['String']['output'];
+  score: Scalars['Int']['output'];
+  skill: Scalars['String']['output'];
+  subSkill: Scalars['String']['output'];
+};
+
+export type SkillStats = {
+  __typename?: 'SkillStats';
+  accuracy: Scalars['Float']['output'];
+  averageScore: Scalars['Float']['output'];
+  correctAnswers: Scalars['Int']['output'];
+  skill: Scalars['String']['output'];
+  subSkill: Scalars['String']['output'];
+  totalQuestions: Scalars['Int']['output'];
+  trend: Scalars['String']['output'];
+};
+
+export type Transcription = {
+  __typename?: 'Transcription';
+  bookId: Scalars['ID']['output'];
+  createdAt: Scalars['String']['output'];
+  duration?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  isCorrect: Scalars['Boolean']['output'];
+  score: Scalars['Int']['output'];
+  text: Scalars['String']['output'];
+  userId: Scalars['ID']['output'];
+  wordCount: Scalars['Int']['output'];
 };
 
 export type User = {
@@ -264,27 +426,30 @@ export type User = {
   token?: Maybe<Scalars['String']['output']>;
 };
 
-export type UserProgress = {
-  __typename?: 'UserProgress';
-  answer: Scalars['String']['output'];
-  completed?: Maybe<Scalars['Boolean']['output']>;
-  explanation?: Maybe<Scalars['String']['output']>;
-  isCorrect: Scalars['Boolean']['output'];
-  question: Scalars['String']['output'];
-  questionId: Scalars['ID']['output'];
-  score?: Maybe<Scalars['Int']['output']>;
-  success?: Maybe<Scalars['Boolean']['output']>;
-  timeAnswer?: Maybe<Scalars['Int']['output']>;
-  timeDuration?: Maybe<Scalars['Int']['output']>;
-  userName?: Maybe<Scalars['String']['output']>;
+export type UserLearningStats = {
+  __typename?: 'UserLearningStats';
+  averageTime: Scalars['Float']['output'];
+  correctAnswers: Scalars['Int']['output'];
+  lastAnalysis?: Maybe<AiAnalysis>;
+  overallAccuracy: Scalars['Float']['output'];
+  skillBreakdown: Array<SkillStats>;
+  totalAnswered: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
+  weeklyProgress: Array<WeeklyProgress>;
 };
 
-export type UserProgressResult = {
-  __typename?: 'UserProgressResult';
+export type UserProgressResponse = {
+  __typename?: 'UserProgressResponse';
+  answer?: Maybe<Scalars['String']['output']>;
+  completed?: Maybe<Scalars['Boolean']['output']>;
   explanation?: Maybe<Scalars['String']['output']>;
   isCorrect?: Maybe<Scalars['Boolean']['output']>;
+  question?: Maybe<Scalars['String']['output']>;
+  questionId?: Maybe<Scalars['ID']['output']>;
   score?: Maybe<Scalars['Int']['output']>;
   success?: Maybe<Scalars['Boolean']['output']>;
+  timeAnswer?: Maybe<Scalars['Float']['output']>;
+  timeDuration?: Maybe<Scalars['Float']['output']>;
   userName?: Maybe<Scalars['String']['output']>;
 };
 
@@ -297,6 +462,15 @@ export type UserScore = {
   score: Scalars['Int']['output'];
   totalQuestions: Scalars['Int']['output'];
   userId: Scalars['ID']['output'];
+};
+
+export type WeeklyProgress = {
+  __typename?: 'WeeklyProgress';
+  accuracy: Scalars['Float']['output'];
+  averageScore: Scalars['Float']['output'];
+  questionsAnswered: Scalars['Int']['output'];
+  topSkills: Array<Scalars['String']['output']>;
+  week: Scalars['String']['output'];
 };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
@@ -343,17 +517,27 @@ export type GenerateMcqQuestionsMutationVariables = Exact<{
   difficulty?: InputMaybe<Scalars['String']['input']>;
   numberOfQuestions?: InputMaybe<Scalars['Int']['input']>;
   language?: InputMaybe<Scalars['String']['input']>;
+  answer: Scalars['String']['input'];
 }>;
 
 
-export type GenerateMcqQuestionsMutation = { __typename?: 'Mutation', generateMCQQuestions: Array<{ __typename?: 'Question', id: string, bookId: string, chapterId?: string | null, question: string, answer: string, createdAt: string, updatedAt: string, option?: { __typename?: 'QuestionOptions', options: Array<string>, explanation: string } | null }> };
+export type GenerateMcqQuestionsMutation = { __typename?: 'Mutation', generateMCQQuestions: Array<{ __typename?: 'Question', _id: string, title: string, text: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, correctAnswer: string, explanation: string } }> }> };
 
-export type GenerateQuestionsMutationVariables = Exact<{
-  chapter: Scalars['String']['input'];
+export type GenerateQuestionsFromTextMutationVariables = Exact<{
+  title: Scalars['String']['input'];
+  text: Scalars['String']['input'];
+  maxQuestions?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type GenerateQuestionsMutation = { __typename?: 'Mutation', generateQuestions: Array<string> };
+export type GenerateQuestionsFromTextMutation = { __typename?: 'Mutation', generateQuestionsFromText: { __typename?: 'Question', text: string, title: string, _id: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } };
+
+export type GenerateUserAnalysisMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type GenerateUserAnalysisMutation = { __typename?: 'Mutation', generateUserAnalysis: { __typename?: 'AnalysisResponse', message: string, success: boolean, analysis?: { __typename?: 'AIAnalysis', overallScore: number, strengths: Array<string>, improvements: Array<string>, recommendations: Array<string>, analysisDate: string, confidence: number, skillAssessments: Array<{ __typename?: 'SkillAssessment', skill: string, subSkill: string, score: number, level: string, feedback: string }> } | null } };
 
 export type GetBookByIdQueryVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -367,13 +551,12 @@ export type GetBooksFromBookFileQueryVariables = Exact<{ [key: string]: never; }
 
 export type GetBooksFromBookFileQuery = { __typename?: 'Query', getBooks: Array<{ __typename?: 'Book', id: string, title: string, chapters: number, author: string, categories: Array<string>, content: Array<string>, image: Array<string>, audio_url: Array<string> }> };
 
-export type GetQuestionsQueryVariables = Exact<{
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
+export type GetUserAnswersQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
 }>;
 
 
-export type GetQuestionsQuery = { __typename?: 'Query', getQuestionsForBook: Array<{ __typename?: 'Question', id: string, bookId: string, chapterId?: string | null, question: string, answer: string, createdAt: string, updatedAt: string, option?: { __typename?: 'QuestionOptions', options: Array<string>, explanation: string } | null }> };
+export type GetUserAnswersQuery = { __typename?: 'Query', getUserAnswers: Array<{ __typename?: 'Answer', _id: string, questionId: string, answer: string, isCorrect: boolean, selectedOption?: string | null, option?: { __typename?: 'QuestionOption', correctAnswer: string, explanation: string, options: Array<string> } | null }> };
 
 export type QueryQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -387,21 +570,17 @@ export type GetUserProgressQueryVariables = Exact<{
 }>;
 
 
-export type GetUserProgressQuery = { __typename?: 'Query', getUserProgress: Array<{ __typename?: 'UserProgress', questionId: string, answer: string, isCorrect: boolean, timeDuration?: number | null, timeAnswer?: number | null, userName?: string | null, completed?: boolean | null, explanation?: string | null, score?: number | null, success?: boolean | null }> };
-
-export type GetUserScoreQueryVariables = Exact<{
-  userId: Scalars['ID']['input'];
-  bookId?: InputMaybe<Scalars['ID']['input']>;
-  chapterId?: InputMaybe<Scalars['ID']['input']>;
-}>;
-
-
-export type GetUserScoreQuery = { __typename?: 'Query', getUserScore: { __typename?: 'UserScore', userId: string, bookId?: string | null, chapterId?: string | null, totalQuestions: number, correctAnswers: number, score: number, percentage: number } };
+export type GetUserProgressQuery = { __typename?: 'Query', getUserProgress?: Array<{ __typename?: 'UserProgressResponse', questionId?: string | null, answer?: string | null, isCorrect?: boolean | null, timeDuration?: number | null, timeAnswer?: number | null, userName?: string | null, completed?: boolean | null, explanation?: string | null, score?: number | null, success?: boolean | null } | null> | null };
 
 export type GetUsersFromUserFileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUsersFromUserFileQuery = { __typename?: 'Query', getUsers: Array<{ __typename?: 'User', id: string, name: string }> };
+
+export type LatestQuestionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LatestQuestionQuery = { __typename?: 'Query', latestQuestion?: { __typename?: 'Question', _id: string, title: string, text: string, createdAt?: string | null, updatedAt?: string | null, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } | null };
 
 export type LoginUserMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -413,10 +592,12 @@ export type LoginUserMutation = { __typename?: 'Mutation', loginUser: { __typena
 export type SubmitAnswerMutationVariables = Exact<{
   questionId: Scalars['ID']['input'];
   userAnswer: Scalars['String']['input'];
+  metadata?: InputMaybe<AnswerMetadataInput>;
+  selectedOption?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type SubmitAnswerMutation = { __typename?: 'Mutation', submitAnswer: { __typename?: 'AnswerResult', id: string, questionId: string, userAnswer: string, correctAnswer: string, isCorrect: boolean, explanation?: string | null, options?: { __typename?: 'QuestionOptions', options: Array<string>, explanation: string } | null } };
+export type SubmitAnswerMutation = { __typename?: 'Mutation', submitAnswer: { __typename?: 'Answer', answer: string, isCorrect: boolean, questionId: string, selectedOption?: string | null, userId: string, answerMetadata?: { __typename?: 'AnswerMetadata', timeSpent?: number | null, attemptCount?: number | null, difficulty?: string | null, questionType?: string | null } | null } };
 
 export type UserProgressMutationVariables = Exact<{
   questionId: Scalars['ID']['input'];
@@ -427,7 +608,7 @@ export type UserProgressMutationVariables = Exact<{
 }>;
 
 
-export type UserProgressMutation = { __typename?: 'Mutation', userProgress?: { __typename?: 'UserProgressResult', success?: boolean | null, isCorrect?: boolean | null, score?: number | null, explanation?: string | null } | null };
+export type UserProgressMutation = { __typename?: 'Mutation', userProgress?: { __typename?: 'UserProgressResponse', success?: boolean | null, isCorrect?: boolean | null, score?: number | null, explanation?: string | null } | null };
 
 export type UpdateBookMutationVariables = Exact<{
   bookId: Scalars['ID']['input'];
@@ -650,7 +831,7 @@ export type DeleteBookMutationHookResult = ReturnType<typeof useDeleteBookMutati
 export type DeleteBookMutationResult = Apollo.MutationResult<DeleteBookMutation>;
 export type DeleteBookMutationOptions = Apollo.BaseMutationOptions<DeleteBookMutation, DeleteBookMutationVariables>;
 export const GenerateMcqQuestionsDocument = gql`
-    mutation GenerateMCQQuestions($content: String!, $bookId: ID, $chapterId: ID, $difficulty: String, $numberOfQuestions: Int, $language: String) {
+    mutation GenerateMCQQuestions($content: String!, $bookId: ID, $chapterId: ID, $difficulty: String, $numberOfQuestions: Int, $language: String, $answer: String!) {
   generateMCQQuestions(
     content: $content
     bookId: $bookId
@@ -658,18 +839,21 @@ export const GenerateMcqQuestionsDocument = gql`
     difficulty: $difficulty
     numberOfQuestions: $numberOfQuestions
     language: $language
+    answer: $answer
   ) {
-    id
-    bookId
-    chapterId
-    question
-    answer
-    option {
-      options
-      explanation
+    _id
+    title
+    text
+    questions {
+      question
+      skill
+      subSkill
+      option {
+        options
+        correctAnswer
+        explanation
+      }
     }
-    createdAt
-    updatedAt
   }
 }
     `;
@@ -694,6 +878,7 @@ export type GenerateMcqQuestionsMutationFn = Apollo.MutationFunction<GenerateMcq
  *      difficulty: // value for 'difficulty'
  *      numberOfQuestions: // value for 'numberOfQuestions'
  *      language: // value for 'language'
+ *      answer: // value for 'answer'
  *   },
  * });
  */
@@ -704,37 +889,106 @@ export function useGenerateMcqQuestionsMutation(baseOptions?: Apollo.MutationHoo
 export type GenerateMcqQuestionsMutationHookResult = ReturnType<typeof useGenerateMcqQuestionsMutation>;
 export type GenerateMcqQuestionsMutationResult = Apollo.MutationResult<GenerateMcqQuestionsMutation>;
 export type GenerateMcqQuestionsMutationOptions = Apollo.BaseMutationOptions<GenerateMcqQuestionsMutation, GenerateMcqQuestionsMutationVariables>;
-export const GenerateQuestionsDocument = gql`
-    mutation GenerateQuestions($chapter: String!) {
-  generateQuestions(chapter: $chapter)
+export const GenerateQuestionsFromTextDocument = gql`
+    mutation GenerateQuestionsFromText($title: String!, $text: String!, $maxQuestions: Int) {
+  generateQuestionsFromText(
+    title: $title
+    text: $text
+    maxQuestions: $maxQuestions
+  ) {
+    questions {
+      question
+      skill
+      subSkill
+      option {
+        options
+        explanation
+        correctAnswer
+      }
+    }
+    text
+    title
+    _id
+  }
 }
     `;
-export type GenerateQuestionsMutationFn = Apollo.MutationFunction<GenerateQuestionsMutation, GenerateQuestionsMutationVariables>;
+export type GenerateQuestionsFromTextMutationFn = Apollo.MutationFunction<GenerateQuestionsFromTextMutation, GenerateQuestionsFromTextMutationVariables>;
 
 /**
- * __useGenerateQuestionsMutation__
+ * __useGenerateQuestionsFromTextMutation__
  *
- * To run a mutation, you first call `useGenerateQuestionsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateQuestionsMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useGenerateQuestionsFromTextMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateQuestionsFromTextMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [generateQuestionsMutation, { data, loading, error }] = useGenerateQuestionsMutation({
+ * const [generateQuestionsFromTextMutation, { data, loading, error }] = useGenerateQuestionsFromTextMutation({
  *   variables: {
- *      chapter: // value for 'chapter'
+ *      title: // value for 'title'
+ *      text: // value for 'text'
+ *      maxQuestions: // value for 'maxQuestions'
  *   },
  * });
  */
-export function useGenerateQuestionsMutation(baseOptions?: Apollo.MutationHookOptions<GenerateQuestionsMutation, GenerateQuestionsMutationVariables>) {
+export function useGenerateQuestionsFromTextMutation(baseOptions?: Apollo.MutationHookOptions<GenerateQuestionsFromTextMutation, GenerateQuestionsFromTextMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<GenerateQuestionsMutation, GenerateQuestionsMutationVariables>(GenerateQuestionsDocument, options);
+        return Apollo.useMutation<GenerateQuestionsFromTextMutation, GenerateQuestionsFromTextMutationVariables>(GenerateQuestionsFromTextDocument, options);
       }
-export type GenerateQuestionsMutationHookResult = ReturnType<typeof useGenerateQuestionsMutation>;
-export type GenerateQuestionsMutationResult = Apollo.MutationResult<GenerateQuestionsMutation>;
-export type GenerateQuestionsMutationOptions = Apollo.BaseMutationOptions<GenerateQuestionsMutation, GenerateQuestionsMutationVariables>;
+export type GenerateQuestionsFromTextMutationHookResult = ReturnType<typeof useGenerateQuestionsFromTextMutation>;
+export type GenerateQuestionsFromTextMutationResult = Apollo.MutationResult<GenerateQuestionsFromTextMutation>;
+export type GenerateQuestionsFromTextMutationOptions = Apollo.BaseMutationOptions<GenerateQuestionsFromTextMutation, GenerateQuestionsFromTextMutationVariables>;
+export const GenerateUserAnalysisDocument = gql`
+    mutation GenerateUserAnalysis($userId: ID!) {
+  generateUserAnalysis(userId: $userId) {
+    analysis {
+      overallScore
+      skillAssessments {
+        skill
+        subSkill
+        score
+        level
+        feedback
+      }
+      strengths
+      improvements
+      recommendations
+      analysisDate
+      confidence
+    }
+    message
+    success
+  }
+}
+    `;
+export type GenerateUserAnalysisMutationFn = Apollo.MutationFunction<GenerateUserAnalysisMutation, GenerateUserAnalysisMutationVariables>;
+
+/**
+ * __useGenerateUserAnalysisMutation__
+ *
+ * To run a mutation, you first call `useGenerateUserAnalysisMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateUserAnalysisMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateUserAnalysisMutation, { data, loading, error }] = useGenerateUserAnalysisMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGenerateUserAnalysisMutation(baseOptions?: Apollo.MutationHookOptions<GenerateUserAnalysisMutation, GenerateUserAnalysisMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<GenerateUserAnalysisMutation, GenerateUserAnalysisMutationVariables>(GenerateUserAnalysisDocument, options);
+      }
+export type GenerateUserAnalysisMutationHookResult = ReturnType<typeof useGenerateUserAnalysisMutation>;
+export type GenerateUserAnalysisMutationResult = Apollo.MutationResult<GenerateUserAnalysisMutation>;
+export type GenerateUserAnalysisMutationOptions = Apollo.BaseMutationOptions<GenerateUserAnalysisMutation, GenerateUserAnalysisMutationVariables>;
 export const GetBookByIdDocument = gql`
     query GetBookById($bookId: ID!) {
   getBookById(bookId: $bookId) {
@@ -828,57 +1082,55 @@ export type GetBooksFromBookFileQueryHookResult = ReturnType<typeof useGetBooksF
 export type GetBooksFromBookFileLazyQueryHookResult = ReturnType<typeof useGetBooksFromBookFileLazyQuery>;
 export type GetBooksFromBookFileSuspenseQueryHookResult = ReturnType<typeof useGetBooksFromBookFileSuspenseQuery>;
 export type GetBooksFromBookFileQueryResult = Apollo.QueryResult<GetBooksFromBookFileQuery, GetBooksFromBookFileQueryVariables>;
-export const GetQuestionsDocument = gql`
-    query GetQuestions($bookId: ID, $chapterId: ID) {
-  getQuestionsForBook(bookId: $bookId, chapterId: $chapterId) {
-    id
-    bookId
-    chapterId
-    question
+export const GetUserAnswersDocument = gql`
+    query GetUserAnswers($userId: ID!) {
+  getUserAnswers(userId: $userId) {
+    _id
+    questionId
     answer
+    isCorrect
+    selectedOption
     option {
-      options
+      correctAnswer
       explanation
+      options
     }
-    createdAt
-    updatedAt
   }
 }
     `;
 
 /**
- * __useGetQuestionsQuery__
+ * __useGetUserAnswersQuery__
  *
- * To run a query within a React component, call `useGetQuestionsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetQuestionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetUserAnswersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserAnswersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetQuestionsQuery({
+ * const { data, loading, error } = useGetUserAnswersQuery({
  *   variables: {
- *      bookId: // value for 'bookId'
- *      chapterId: // value for 'chapterId'
+ *      userId: // value for 'userId'
  *   },
  * });
  */
-export function useGetQuestionsQuery(baseOptions?: Apollo.QueryHookOptions<GetQuestionsQuery, GetQuestionsQueryVariables>) {
+export function useGetUserAnswersQuery(baseOptions: Apollo.QueryHookOptions<GetUserAnswersQuery, GetUserAnswersQueryVariables> & ({ variables: GetUserAnswersQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetQuestionsQuery, GetQuestionsQueryVariables>(GetQuestionsDocument, options);
+        return Apollo.useQuery<GetUserAnswersQuery, GetUserAnswersQueryVariables>(GetUserAnswersDocument, options);
       }
-export function useGetQuestionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetQuestionsQuery, GetQuestionsQueryVariables>) {
+export function useGetUserAnswersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserAnswersQuery, GetUserAnswersQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetQuestionsQuery, GetQuestionsQueryVariables>(GetQuestionsDocument, options);
+          return Apollo.useLazyQuery<GetUserAnswersQuery, GetUserAnswersQueryVariables>(GetUserAnswersDocument, options);
         }
-export function useGetQuestionsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetQuestionsQuery, GetQuestionsQueryVariables>) {
+export function useGetUserAnswersSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserAnswersQuery, GetUserAnswersQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetQuestionsQuery, GetQuestionsQueryVariables>(GetQuestionsDocument, options);
+          return Apollo.useSuspenseQuery<GetUserAnswersQuery, GetUserAnswersQueryVariables>(GetUserAnswersDocument, options);
         }
-export type GetQuestionsQueryHookResult = ReturnType<typeof useGetQuestionsQuery>;
-export type GetQuestionsLazyQueryHookResult = ReturnType<typeof useGetQuestionsLazyQuery>;
-export type GetQuestionsSuspenseQueryHookResult = ReturnType<typeof useGetQuestionsSuspenseQuery>;
-export type GetQuestionsQueryResult = Apollo.QueryResult<GetQuestionsQuery, GetQuestionsQueryVariables>;
+export type GetUserAnswersQueryHookResult = ReturnType<typeof useGetUserAnswersQuery>;
+export type GetUserAnswersLazyQueryHookResult = ReturnType<typeof useGetUserAnswersLazyQuery>;
+export type GetUserAnswersSuspenseQueryHookResult = ReturnType<typeof useGetUserAnswersSuspenseQuery>;
+export type GetUserAnswersQueryResult = Apollo.QueryResult<GetUserAnswersQuery, GetUserAnswersQueryVariables>;
 export const QueryDocument = gql`
     query Query($userId: ID!) {
   getUserById(userId: $userId) {
@@ -969,54 +1221,6 @@ export type GetUserProgressQueryHookResult = ReturnType<typeof useGetUserProgres
 export type GetUserProgressLazyQueryHookResult = ReturnType<typeof useGetUserProgressLazyQuery>;
 export type GetUserProgressSuspenseQueryHookResult = ReturnType<typeof useGetUserProgressSuspenseQuery>;
 export type GetUserProgressQueryResult = Apollo.QueryResult<GetUserProgressQuery, GetUserProgressQueryVariables>;
-export const GetUserScoreDocument = gql`
-    query GetUserScore($userId: ID!, $bookId: ID, $chapterId: ID) {
-  getUserScore(userId: $userId, bookId: $bookId, chapterId: $chapterId) {
-    userId
-    bookId
-    chapterId
-    totalQuestions
-    correctAnswers
-    score
-    percentage
-  }
-}
-    `;
-
-/**
- * __useGetUserScoreQuery__
- *
- * To run a query within a React component, call `useGetUserScoreQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetUserScoreQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetUserScoreQuery({
- *   variables: {
- *      userId: // value for 'userId'
- *      bookId: // value for 'bookId'
- *      chapterId: // value for 'chapterId'
- *   },
- * });
- */
-export function useGetUserScoreQuery(baseOptions: Apollo.QueryHookOptions<GetUserScoreQuery, GetUserScoreQueryVariables> & ({ variables: GetUserScoreQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetUserScoreQuery, GetUserScoreQueryVariables>(GetUserScoreDocument, options);
-      }
-export function useGetUserScoreLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserScoreQuery, GetUserScoreQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetUserScoreQuery, GetUserScoreQueryVariables>(GetUserScoreDocument, options);
-        }
-export function useGetUserScoreSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserScoreQuery, GetUserScoreQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetUserScoreQuery, GetUserScoreQueryVariables>(GetUserScoreDocument, options);
-        }
-export type GetUserScoreQueryHookResult = ReturnType<typeof useGetUserScoreQuery>;
-export type GetUserScoreLazyQueryHookResult = ReturnType<typeof useGetUserScoreLazyQuery>;
-export type GetUserScoreSuspenseQueryHookResult = ReturnType<typeof useGetUserScoreSuspenseQuery>;
-export type GetUserScoreQueryResult = Apollo.QueryResult<GetUserScoreQuery, GetUserScoreQueryVariables>;
 export const GetUsersFromUserFileDocument = gql`
     query GetUsersFromUserFile {
   getUsers {
@@ -1057,6 +1261,59 @@ export type GetUsersFromUserFileQueryHookResult = ReturnType<typeof useGetUsersF
 export type GetUsersFromUserFileLazyQueryHookResult = ReturnType<typeof useGetUsersFromUserFileLazyQuery>;
 export type GetUsersFromUserFileSuspenseQueryHookResult = ReturnType<typeof useGetUsersFromUserFileSuspenseQuery>;
 export type GetUsersFromUserFileQueryResult = Apollo.QueryResult<GetUsersFromUserFileQuery, GetUsersFromUserFileQueryVariables>;
+export const LatestQuestionDocument = gql`
+    query LatestQuestion {
+  latestQuestion {
+    _id
+    title
+    text
+    questions {
+      question
+      skill
+      subSkill
+      option {
+        options
+        explanation
+        correctAnswer
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useLatestQuestionQuery__
+ *
+ * To run a query within a React component, call `useLatestQuestionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useLatestQuestionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useLatestQuestionQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLatestQuestionQuery(baseOptions?: Apollo.QueryHookOptions<LatestQuestionQuery, LatestQuestionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<LatestQuestionQuery, LatestQuestionQueryVariables>(LatestQuestionDocument, options);
+      }
+export function useLatestQuestionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LatestQuestionQuery, LatestQuestionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<LatestQuestionQuery, LatestQuestionQueryVariables>(LatestQuestionDocument, options);
+        }
+export function useLatestQuestionSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LatestQuestionQuery, LatestQuestionQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LatestQuestionQuery, LatestQuestionQueryVariables>(LatestQuestionDocument, options);
+        }
+export type LatestQuestionQueryHookResult = ReturnType<typeof useLatestQuestionQuery>;
+export type LatestQuestionLazyQueryHookResult = ReturnType<typeof useLatestQuestionLazyQuery>;
+export type LatestQuestionSuspenseQueryHookResult = ReturnType<typeof useLatestQuestionSuspenseQuery>;
+export type LatestQuestionQueryResult = Apollo.QueryResult<LatestQuestionQuery, LatestQuestionQueryVariables>;
 export const LoginUserDocument = gql`
     mutation LoginUser($name: String!) {
   loginUser(name: $name) {
@@ -1095,18 +1352,24 @@ export type LoginUserMutationHookResult = ReturnType<typeof useLoginUserMutation
 export type LoginUserMutationResult = Apollo.MutationResult<LoginUserMutation>;
 export type LoginUserMutationOptions = Apollo.BaseMutationOptions<LoginUserMutation, LoginUserMutationVariables>;
 export const SubmitAnswerDocument = gql`
-    mutation SubmitAnswer($questionId: ID!, $userAnswer: String!) {
-  submitAnswer(questionId: $questionId, userAnswer: $userAnswer) {
-    id
-    questionId
-    userAnswer
-    correctAnswer
-    isCorrect
-    options {
-      options
-      explanation
+    mutation SubmitAnswer($questionId: ID!, $userAnswer: String!, $metadata: AnswerMetadataInput, $selectedOption: String) {
+  submitAnswer(
+    questionId: $questionId
+    userAnswer: $userAnswer
+    metadata: $metadata
+    selectedOption: $selectedOption
+  ) {
+    answer
+    answerMetadata {
+      timeSpent
+      attemptCount
+      difficulty
+      questionType
     }
-    explanation
+    isCorrect
+    questionId
+    selectedOption
+    userId
   }
 }
     `;
@@ -1127,6 +1390,8 @@ export type SubmitAnswerMutationFn = Apollo.MutationFunction<SubmitAnswerMutatio
  *   variables: {
  *      questionId: // value for 'questionId'
  *      userAnswer: // value for 'userAnswer'
+ *      metadata: // value for 'metadata'
+ *      selectedOption: // value for 'selectedOption'
  *   },
  * });
  */

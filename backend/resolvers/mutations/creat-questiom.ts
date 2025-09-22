@@ -23,28 +23,30 @@ export const generateQuestionsFromText = async (
   args: {
     title: string;
     text: string;
+    skill: string;
+    subSkill: string;
     maxQuestions?: number;
   }
 ) => {
   try {
     // Args-аас утгуудыг задлах
-    const { title, text, maxQuestions = 8 } = args;
-    
+    const { title, text, skill, subSkill, maxQuestions = 8 } = args;
+
     // Debug мэдээлэл
     console.log("generateQuestionsFromText called with:", {
       title: typeof title,
       text: typeof text,
       maxQuestions,
       titleValue: title,
-      textValue: text
+      textValue: text,
     });
 
     // Input validation
-    if (!title || typeof title !== 'string') {
+    if (!title || typeof title !== "string") {
       throw new Error("Title заавал string байх ёстой");
     }
-    
-    if (!text || typeof text !== 'string') {
+
+    if (!text || typeof text !== "string") {
       throw new Error("Text заавал string байх ёстой");
     }
 
@@ -141,9 +143,10 @@ export const generateQuestionsFromText = async (
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { 
-          role: "system", 
-          content: "You must return ONLY valid JSON format. No explanations, no markdown, no extra text." 
+        {
+          role: "system",
+          content:
+            "You must return ONLY valid JSON format. No explanations, no markdown, no extra text.",
         },
         { role: "user", content: prompt },
       ],
@@ -160,53 +163,60 @@ export const generateQuestionsFromText = async (
     try {
       const parsed = parseJsonFromText(aiText);
       console.log("Parsed successfully:", parsed);
-      
+
       if (!parsed?.questions || !Array.isArray(parsed.questions)) {
         throw new Error("AI did not return questions array.");
       }
 
-      const questions = parsed.questions.slice(0, maxQuestions).map((q: any) => ({
-        question: String(q.question || "").trim(),
-        option: {
-          options: (q.option?.options || []).map((o: any) => String(o).trim()),
-          explanation: String(q.option?.explanation || "").trim(),
-          correctAnswer: String(q.option?.correctAnswer || "").trim(),
-        },
-      }));
+      const questions = parsed.questions
+        .slice(0, maxQuestions)
+        .map((q: any) => ({
+          question: String(q.question || "").trim(),
+          skill: q.skill ? String(q.skill).trim() : skill,
+          subSkill: q.subSkill ? String(q.subSkill).trim() : subSkill,
+          option: {
+            options: (q.option?.options || []).map((o: any) =>
+              String(o).trim()
+            ),
+            explanation: String(q.option?.explanation || "").trim(),
+            correctAnswer: String(q.option?.correctAnswer || "").trim(),
+          },
+        }));
 
       // Хадгалахын өмнө утгуудыг шалгах
       console.log("Before saving to DB:", {
         title: title.trim(),
         text: text.trim(),
-        questionsLength: questions.length
+        questionsLength: questions.length,
       });
 
       const doc = new Question({
         title: title.trim(),
         text: text.trim(),
+        skill: skill,
+        subSkill: subSkill,
         questions,
       });
 
       await doc.save();
-      
+
       console.log("Saved document:", {
         id: doc._id,
         title: doc.title,
         text: doc.text,
-        questionsCount: doc.questions.length
+        questionsCount: doc.questions.length,
       });
-      
+
       return doc;
-      
     } catch (parseError) {
       console.error("Parse error details:", parseError);
       console.log("Attempting manual JSON extraction...");
-      
+
       // Manual JSON extraction attempt
-      const lines = aiText.split('\n');
+      const lines = aiText.split("\n");
       let jsonStart = -1;
       let jsonEnd = -1;
-      
+
       // for (let i = 0; i < lines.length; i++) {
       //   if (lines[i].includes('{') && jsonStart === -1) {
       //     jsonStart = i;
@@ -215,28 +225,38 @@ export const generateQuestionsFromText = async (
       //     jsonEnd = i;
       //   }
       // }
-      
+
       if (jsonStart !== -1 && jsonEnd !== -1) {
-        const jsonText = lines.slice(jsonStart, jsonEnd + 1).join('\n');
+        const jsonText = lines.slice(jsonStart, jsonEnd + 1).join("\n");
         console.log("Extracted JSON:", jsonText);
         try {
           const manualParsed = JSON.parse(jsonText);
           console.log("Manual parse successful:", manualParsed);
-          
+
           // Manual parse амжилттай бол үргэлжлүүлэх
-          if (manualParsed && manualParsed.questions && Array.isArray(manualParsed.questions)) {
-            const questions = manualParsed.questions.slice(0, maxQuestions).map((q: any) => ({
-              question: String(q.question || "").trim(),
-              option: {
-                options: (q.option?.options || []).map((o: any) => String(o).trim()),
-                explanation: String(q.option?.explanation || "").trim(),
-                correctAnswer: String(q.option?.correctAnswer || "").trim(),
-              },
-            }));
+          if (
+            manualParsed &&
+            manualParsed.questions &&
+            Array.isArray(manualParsed.questions)
+          ) {
+            const questions = manualParsed.questions
+              .slice(0, maxQuestions)
+              .map((q: any) => ({
+                question: String(q.question || "").trim(),
+                option: {
+                  options: (q.option?.options || []).map((o: any) =>
+                    String(o).trim()
+                  ),
+                  explanation: String(q.option?.explanation || "").trim(),
+                  correctAnswer: String(q.option?.correctAnswer || "").trim(),
+                },
+              }));
 
             const doc = new Question({
               title: title.trim(),
               text: text.trim(),
+              skill: skill,
+              subSkill: subSkill,
               questions,
             });
 
@@ -247,7 +267,7 @@ export const generateQuestionsFromText = async (
           console.error("Manual parse also failed:", manualError);
         }
       }
-      
+
       throw new Error("AI response parsing failed");
     }
   } catch (err: any) {
