@@ -14,7 +14,7 @@ export const resolvers = {
     loginUser: Mutation.loginUser,
     updateBook: Mutation.updateBook,
     deleteBook: Mutation.deleteBook,
-    createQuestion: Mutation.createQuestion
+    createQuestion: Mutation.createQuestion,
     transcribeAudio: Mutation.transcribeAudio,
   },
   Query: {
@@ -31,7 +31,6 @@ export const resolvers = {
     getTranscription: Query.getTranscription,
   },
 
-  
   Question: {
     option: (parent: any) => {
       if (parent.option && typeof parent.option === "string") {
