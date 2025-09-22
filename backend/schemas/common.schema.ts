@@ -7,7 +7,7 @@ export const typeDefs = `
 
   type AuthPayload{
    user: User!
-  token: String!
+    token: String!
   }
 
   type Book {
@@ -131,8 +131,6 @@ type UserScore {
     getBookById(bookId:ID!): Book!
     getUserProgress(userId:ID!): [UserProgressResponse]
     getUserById(userId:ID!) : User!
-  questions: [Question!]!
-  question(id: ID!): Question
 
     getTranscriptions(userId: ID!): [Transcription]!
     getTranscription(id: ID!): Transcription
@@ -168,44 +166,11 @@ type UserScore {
 
     userProgress(userId: ID, bookId: ID, chapterId: ID, questionId: ID!, answer: String!, timeDuration: Int!, timeAnswer:Int!):UserProgressResponse
     loginUser(name: String!): AuthPayload!
-<<<<<<< HEAD
-   deleteBook(bookId: ID!): DeleteResponse!
+    deleteBook(bookId: ID!): DeleteResponse!
+
     updateBook(  bookId: ID!, title: String, chapters: Int, author: String, categories: [String], content: String, image: [String], audio_url: [String]) : Book!
-     createQuestion(
-    title: String!
-    text: String!
-    type: String!
-    question: String!
-    option: QuestionOptionsInput
-    createdBy: ID!
-    assignedTo: ID
-  ):Question!
-=======
-    generateQuestionsWithContent(
-      content: String!
-      bookId: ID
-      chapterId: ID
-      difficulty: String
-      numberOfQuestions: Int
-    ): GeneratedQuestions!
-    generateMCQQuestions(
-      content: String!
-      bookId: ID
-      chapterId: ID
-      difficulty: String
-      numberOfQuestions: Int
-      language: String
-    ): [Question!]!
-    submitAnswer(
-      questionId: ID!
-      userAnswer: String!
-      bookId: ID
-      chapterId: ID
-    ): AnswerResult!
-     transcribeAudio(userId: ID!, bookId: ID!, audioBase64: String!): Transcription!
->>>>>>> cc17bb1 (audio)
+    createQuestion( title: String!, text: String!, type: String!, question: String!, option: QuestionOptionsInput, createdBy: ID!, assignedTo: ID):Question!
+
+    transcribeAudio(userId: ID!, bookId: ID!, audioBase64: String!): Transcription!
   }
-
-
-
 `;
