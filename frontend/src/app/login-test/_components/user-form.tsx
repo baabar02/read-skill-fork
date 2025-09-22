@@ -86,13 +86,14 @@ export default function AuthForm() {
   return (
     <form
       onSubmit={(e) => e.preventDefault()}
-      className="max-w-md mx-auto p-6 space-y-4 bg-white shadow-lg rounded-lg"
+      className="max-w-md mx-auto p-6 space-y-4 bg-[rgba(171,9,225,0.88)] shadow-lg rounded-lg"
     >
-      <h2 className="text-2xl font-bold text-center">Бүртгүүлэх / Нэвтрэх</h2>
+      <h2 className="text-2xl font-bold text-center text-white">Бүртгүүлэх / Нэвтрэх</h2>
 
       <div>
-        <Label htmlFor="name">Нэр</Label>
+        {/* <Label htmlFor="name">Нэр</Label> */}
         <Input
+        className="bg-white border-2"
           id="name"
           type="text"
           placeholder="Нэрээ оруулна уу..."
@@ -104,7 +105,7 @@ export default function AuthForm() {
       <div className="flex space-x-4">
         <Button
           type="button"
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+          className="flex-1 bg-[#8cc63f] text-lg bold text-white"
           onClick={handleRegister}
         >
           Бүртгүүлэх
@@ -112,7 +113,7 @@ export default function AuthForm() {
 
         <Button
           type="button"
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+          className="flex-1 bg-[#009EE2] text-lg-bold text-white"
           onClick={handleLogin}
         >
           Нэвтрэх

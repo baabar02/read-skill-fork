@@ -11,3 +11,4 @@ export * from "./update-book-mutation";
 export * from "./delete-book-mutation";
 export * from "./creat-questiom"
 export * from "./add-audio-mutation";
+export * from "./AI-Analysis"

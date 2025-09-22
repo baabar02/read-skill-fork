@@ -8,6 +8,8 @@ interface QuestionOption {
 
 interface GeneratedQuestion {
   question: string;
+  skill: string;
+  subSkill: string;
   option: QuestionOption;
 }
 

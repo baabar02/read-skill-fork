@@ -14,15 +14,16 @@ export const resolvers = {
     loginUser: Mutation.loginUser,
     updateBook: Mutation.updateBook,
     deleteBook: Mutation.deleteBook,
-    
+
     transcribeAudio: Mutation.transcribeAudio,
-   generateQuestionsFromText:Mutation.generateQuestionsFromText
+    generateQuestionsFromText: Mutation.generateQuestionsFromText,
+    generateUserAnalysis: Mutation.generateUserAnalysis,
   },
   Query: {
     getUsers: Query.getUsers,
-    getQuestionsForBook: Query.getQuestionsForBook,
+    // getQuestionsForBook: Query.getQuestionsForBook,
     getUserAnswers: Query.getUserAnswers,
-    getUserScore: Query.getUserScore,
+    // getUserScore: Query.getUserScore,
 
     // getBookById: Query.getBookById,
     getBooks: Query.getBooks,
