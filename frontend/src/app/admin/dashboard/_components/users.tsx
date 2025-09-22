@@ -51,7 +51,10 @@ export const UsersInfo = () => {
   console.log("Progress Data:", progressData);
 
   const totalQuestions = userProgress.length;
-  const correctAnswers = userProgress.filter((item) => item.isCorrect).length;
+  const correctAnswers = userProgress.filter(
+    (item) => item !== null && item.isCorrect
+  ).length;
+
   const percentage =
     totalQuestions === 0
       ? 0
@@ -72,8 +75,9 @@ export const UsersInfo = () => {
 
           const thisTotal = thisUserProgress.length;
           const thisCorrect = thisUserProgress.filter(
-            (p) => p.isCorrect
+            (p) => p !== null && p.isCorrect
           ).length;
+
           const thisPercentage =
             thisTotal === 0 ? 0 : Math.round((thisCorrect / thisTotal) * 100);
 

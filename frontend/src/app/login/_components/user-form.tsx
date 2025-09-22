@@ -68,6 +68,12 @@ export default function AuthForm() {
         setErrorMessage("Нэвтрэхэд алдаа гарлаа.");
         return;
       }
+
+      const token = data.loginUser.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
       console.log("loginData:", data.loginUser);
       setUser({
         id: data.loginUser.user.id,
@@ -88,12 +94,14 @@ export default function AuthForm() {
       onSubmit={(e) => e.preventDefault()}
       className="max-w-md mx-auto p-6 space-y-4 bg-[rgba(171,9,225,0.88)] shadow-lg rounded-lg"
     >
-      <h2 className="text-2xl font-bold text-center text-white">Бүртгүүлэх / Нэвтрэх</h2>
+      <h2 className="text-2xl font-bold text-center text-white">
+        Бүртгүүлэх / Нэвтрэх
+      </h2>
 
       <div>
         {/* <Label htmlFor="name">Нэр</Label> */}
         <Input
-        className="bg-white border-2"
+          className="bg-white border-2"
           id="name"
           type="text"
           placeholder="Нэрээ оруулна уу..."

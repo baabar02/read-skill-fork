@@ -1,0 +1,14 @@
+query GetUserAnswers($userId: ID!) {
+  getUserAnswers(userId: $userId) {
+    _id
+    questionId
+    answer
+    isCorrect
+    selectedOption
+    option {
+      correctAnswer
+      explanation
+      options
+    }
+  }
+}

@@ -1,29 +1,12 @@
 import { Question } from "../../models/question-model";
 
-// Get questions for a book/chapter
-export const getQuestionsForBook = async (
-  _: unknown,
-  args: {
-    bookId?: string;
-    chapterId?: string;
-  }
-) => {
+export const latestQuestion = async (_: unknown) => {
   try {
-    let query: any = {};
-    if (args.bookId) {
-      query.bookId = args.bookId;
-    }
-    if (args.chapterId) {
-      query.chapterId = args.chapterId;
-    }
-
-    const questions = await (Question )
-      .find(query)
-      .populate("bookId")
-      .populate("chapterId");
-    return questions;
+    const latest = await Question.findOne().sort({ createdAt: -1 }).exec();
+    if (!latest) throw new Error("No documents found");
+    return latest;
   } catch (error) {
-    console.error("Error fetching questions:", error);
-    throw new Error("Failed to fetch questions");
+    console.error("Error fetching latest text:", error);
+    throw new Error("Failed to fetch latest text");
   }
 };

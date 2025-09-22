@@ -1,3 +1,25 @@
-mutation GenerateQuestions($chapter: String!) {
-  generateQuestions(chapter: $chapter)
+mutation GenerateQuestionsFromText(
+  $title: String!
+  $text: String!
+  $maxQuestions: Int
+) {
+  generateQuestionsFromText(
+    title: $title
+    text: $text
+    maxQuestions: $maxQuestions
+  ) {
+    questions {
+      question
+      skill
+      subSkill
+      option {
+        options
+        explanation
+        correctAnswer
+      }
+    }
+    text
+    title
+    _id
+  }
 }

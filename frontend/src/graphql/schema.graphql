@@ -3,6 +3,7 @@ type User {
   name: String!
   token: String
 }
+
 type AuthPayload {
   user: User!
   token: String!
@@ -32,36 +33,255 @@ type Content {
   chapter: Chapter!
 }
 
+type QuestionOption {
+  options: [String!]!
+  explanation: String!
+  correctAnswer: String!
+}
+
+type GeneratedQuestion {
+  question: String!
+  skill: String!
+  subSkill: String!
+  option: QuestionOption!
+}
+
 type Question {
-  id: ID!
+  _id: ID!
   title: String!
   text: String!
-  type: QuestionType!
-  question: String!
-  option: QuestionOptions
-  createdBy: ID!
-  assignedTo: ID
-  createdAt: String!
-  updatedAt: String!
-  bookId: ID
-  chapterId: ID
-  answer: String
+  questions: [GeneratedQuestion!]!
+  option: QuestionOption
+  createdAt: String
+  updatedAt: String
 }
-enum QuestionType {
-  mcq
-  open
+
+type SkillAssessment {
+  skill: String!
+  subSkill: String!
+  score: Int!
+  level: String!
+  feedback: String!
+}
+
+type AIAnalysis {
+  overallScore: Int!
+  skillAssessments: [SkillAssessment!]!
+  strengths: [String!]!
+  improvements: [String!]!
+  recommendations: [String!]!
+  analysisDate: String!
+  confidence: Float!
+}
+
+type AnswerMetadata {
+  timeSpent: Int
+  attemptCount: Int
+  difficulty: String
+  questionType: String
 }
 
 type Answer {
-  id: ID!
-  bookId: ID!
-  chapterId: ID!
+  _id: ID!
   questionId: ID!
-  userId: ID!
+  userId: String!
   answer: String!
   isCorrect: Boolean!
+  selectedOption: String
+  option: QuestionOption
+  aiAnalysis: AIAnalysis
+  answerMetadata: AnswerMetadata
   createdAt: String!
   updatedAt: String!
+}
+
+type UserLearningStats {
+  userId: ID!
+  totalAnswered: Int!
+  correctAnswers: Int!
+  overallAccuracy: Float!
+  averageTime: Float!
+  skillBreakdown: [SkillStats!]!
+  weeklyProgress: [WeeklyProgress!]!
+  lastAnalysis: AIAnalysis
+}
+
+type SkillStats {
+  skill: String!
+  subSkill: String!
+  totalQuestions: Int!
+  correctAnswers: Int!
+  accuracy: Float!
+  averageScore: Float!
+  trend: String!
+}
+
+type WeeklyProgress {
+  week: String!
+  questionsAnswered: Int!
+  accuracy: Float!
+  averageScore: Float!
+  topSkills: [String!]!
+}
+
+type Transcription {
+  id: ID!
+  text: String!
+  userId: ID!
+  bookId: ID!
+  isCorrect: Boolean!
+  score: Int!
+  createdAt: String!
+  wordCount: Int!
+  duration: Int
+}
+
+# Inputs
+input QuestionOptionsInput {
+  options: [String!]!
+  answer: String!
+  explanation: String
+}
+
+input AnswerMetadataInput {
+  timeSpent: Int
+  attemptCount: Int
+  difficulty: String
+  questionType: String
+}
+
+type Query {
+  getUsers: [User!]!
+  getUserAnswers(userId: ID!): [Answer!]!
+  getUserById(userId: ID!): User!
+  getBooks: [Book!]!
+  getBookById(bookId: ID!): Book!
+  getUserProgress(userId: ID!): [UserProgressResponse]
+  getTranscriptions(userId: ID!): [Transcription]!
+  getTranscription(id: ID!): Transcription
+  questions: [Question!]!
+  question(id: ID!): Question
+  latestQuestion: Question
+  getUserLearningStats(userId: ID!): UserLearningStats!
+  getSkillAnalysis(userId: ID!, skill: String): [SkillAssessment!]!
+  getUserAIAnalysis(userId: ID!): AIAnalysis
+  _dummy: String
+}
+
+type UserProgressResponse {
+  questionId: ID
+  question: String
+  answer: String
+  isCorrect: Boolean
+  timeDuration: Float
+  timeAnswer: Float
+  userName: String
+  completed: Boolean
+  score: Int
+  explanation: String
+  success: Boolean
+}
+
+type DeleteResponse {
+  success: Boolean!
+  message: String
+}
+
+type AnalysisResponse {
+  success: Boolean!
+  message: String!
+  analysis: AIAnalysis
+}
+
+type Mutation {
+  createUser(name: String!): AuthPayload!
+  loginUser(name: String!): AuthPayload!
+
+  addBook(
+    title: String!
+    chapters: Int
+    author: String
+    categories: [String]
+    content: String
+    image: [String]
+    audio_url: [String]
+  ): Book!
+  addContent(
+    bookId: ID!
+    title: String
+    content: [String]
+    audio_url: String
+  ): Chapter!
+  updateBook(
+    bookId: ID!
+    title: String
+    chapters: Int
+    author: String
+    categories: [String]
+    content: String
+    image: [String]
+    audio_url: [String]
+  ): Book!
+  deleteBook(bookId: ID!): DeleteResponse!
+
+  generateQuestions(chapter: String!): [String!]!
+  generateQuestionsWithContent(
+    content: String!
+    bookId: ID
+    chapterId: ID
+    difficulty: String
+    numberOfQuestions: Int
+  ): GeneratedQuestions!
+  generateMCQQuestions(
+    content: String!
+    bookId: ID
+    chapterId: ID
+    difficulty: String
+    numberOfQuestions: Int
+    answer: String!
+    language: String
+  ): [Question!]!
+  generateQuestionsFromText(
+    title: String!
+    text: String!
+    maxQuestions: Int = 8
+  ): Question!
+  createQuestion(
+    title: String!
+    text: String!
+    type: String!
+    question: String!
+    option: QuestionOptionsInput
+    createdBy: ID!
+    assignedTo: ID
+  ): Question!
+
+  submitAnswer(
+    questionId: ID!
+    userAnswer: String!
+    selectedOption: String
+    metadata: AnswerMetadataInput
+  ): Answer!
+
+  userProgress(
+    userId: ID
+    bookId: ID
+    chapterId: ID
+    questionId: ID!
+    answer: String!
+    timeDuration: Int!
+    timeAnswer: Int!
+  ): UserProgressResponse
+
+  transcribeAudio(
+    userId: ID!
+    bookId: ID!
+    audioBase64: String!
+  ): Transcription!
+
+  generateUserAnalysis(userId: ID!): AnalysisResponse!
+  requestSkillAssessment(userId: ID!, skills: [String!]): AnalysisResponse!
+  updateLearningGoals(userId: ID!, goals: [String!]!): Boolean!
 }
 
 type GeneratedQuestions {
@@ -96,121 +316,4 @@ type UserScore {
   correctAnswers: Int!
   score: Int!
   percentage: Int!
-}
-type UserProgress {
-  questionId: ID!
-  question: String!
-  answer: String!
-  isCorrect: Boolean!
-  timeDuration: Int
-  timeAnswer: Int
-  userName: String
-  completed: Boolean
-  score: Int
-  explanation: String
-  success: Boolean
-}
-type UserProgressResult {
-  success: Boolean
-  isCorrect: Boolean
-  score: Int
-  explanation: String
-  userName: String
-}
-
-input QuestionOptionsInput {
-  options: [String!]!
-  answer: String!
-  explanation: String
-}
-
-type Query {
-  getUsers: [User!]!
-  getQuestionsForBook(bookId: ID, chapterId: ID): [Question!]!
-  getUserAnswers(userId: ID!, bookId: ID, chapterId: ID): [Answer!]!
-  getUserScore(userId: ID!, bookId: ID, chapterId: ID): UserScore!
-  getBooks: [Book!]!
-  getBookById(bookId: ID!): Book!
-  getUserProgress(userId: ID!): [UserProgress!]!
-  getUserById(userId: ID!): User!
-}
-
-type DeleteResponse {
-  success: Boolean!
-  message: String
-}
-
-type Mutation {
-  userProgress(
-    questionId: ID!
-    answer: String!
-    timeDuration: Int!
-    timeAnswer: Int!
-    userId: ID
-  ): UserProgressResult
-
-  createUser(name: String!): AuthPayload!
-
-  addBook(
-    title: String!
-    chapters: Int
-    author: String
-    categories: [String]
-    content: String
-    image: [String]
-    audio_url: [String]
-  ): Book!
-  addContent(
-    bookId: ID!
-    title: String
-    content: [String]
-    audio_url: String
-  ): Chapter!
-  generateQuestions(chapter: String!): [String!]!
-  generateQuestionsWithContent(
-    content: String!
-    bookId: ID
-    chapterId: ID
-    difficulty: String
-    numberOfQuestions: Int
-  ): GeneratedQuestions!
-  generateMCQQuestions(
-    content: String!
-    bookId: ID
-    chapterId: ID
-    difficulty: String
-    numberOfQuestions: Int
-    language: String
-    answer: String!
-  ): [Question!]!
-  submitAnswer(
-    questionId: ID!
-    userAnswer: String!
-    bookId: ID
-    chapterId: ID
-  ): AnswerResult!
-  loginUser(name: String!): AuthPayload!
-
-  updateBook(
-    bookId: ID!
-    title: String
-    chapters: Int
-    author: String
-    categories: [String]
-    content: String
-    image: [String]
-    audio_url: [String]
-  ): Book!
-
-  deleteBook(bookId: ID!): DeleteResponse!
-
-  createQuestion(
-    title: String!
-    text: String!
-    type: QuestionType!
-    question: String!
-    option: QuestionOptionsInput
-    createdBy: ID!
-    assignedTo: ID
-  ): [Question!]!
 }

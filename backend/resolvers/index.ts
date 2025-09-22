@@ -21,7 +21,7 @@ export const resolvers = {
   },
   Query: {
     getUsers: Query.getUsers,
-    // getQuestionsForBook: Query.getQuestionsForBook,
+    latestQuestion: Query.latestQuestion,
     getUserAnswers: Query.getUserAnswers,
     // getUserScore: Query.getUserScore,
 

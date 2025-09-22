@@ -1,14 +1,25 @@
-mutation SubmitAnswer($questionId: ID!, $userAnswer: String!) {
-  submitAnswer(questionId: $questionId, userAnswer: $userAnswer) {
-    id
-    questionId
-    userAnswer
-    correctAnswer
-    isCorrect
-    options {
-      options
-      explanation
+mutation SubmitAnswer(
+  $questionId: ID!
+  $userAnswer: String!
+  $metadata: AnswerMetadataInput
+  $selectedOption: String
+) {
+  submitAnswer(
+    questionId: $questionId
+    userAnswer: $userAnswer
+    metadata: $metadata
+    selectedOption: $selectedOption
+  ) {
+    answer
+    answerMetadata {
+      timeSpent
+      attemptCount
+      difficulty
+      questionType
     }
-    explanation
+    isCorrect
+    questionId
+    selectedOption
+    userId
   }
 }

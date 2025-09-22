@@ -1,0 +1,19 @@
+query LatestQuestion {
+  latestQuestion {
+    _id
+    title
+    text
+    questions {
+      question
+      skill
+      subSkill
+      option {
+        options
+        explanation
+        correctAnswer
+      }
+    }
+    createdAt
+    updatedAt
+  }
+}

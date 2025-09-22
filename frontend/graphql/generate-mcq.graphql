@@ -5,6 +5,7 @@ mutation GenerateMCQQuestions(
   $difficulty: String
   $numberOfQuestions: Int
   $language: String
+  $answer: String!
 ) {
   generateMCQQuestions(
     content: $content
@@ -13,17 +14,20 @@ mutation GenerateMCQQuestions(
     difficulty: $difficulty
     numberOfQuestions: $numberOfQuestions
     language: $language
+    answer: $answer
   ) {
-    id
-    bookId
-    chapterId
-    question
-    answer
-    option {
-      options
-      explanation
+    _id
+    title
+    text
+    questions {
+      question
+      skill
+      subSkill
+      option {
+        options
+        correctAnswer
+        explanation
+      }
     }
-    createdAt
-    updatedAt
   }
 }
