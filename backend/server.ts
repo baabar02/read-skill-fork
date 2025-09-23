@@ -14,7 +14,7 @@ interface MyContext {
 const server = new ApolloServer<MyContext>({
   typeDefs,
   resolvers,
-  introspection: true
+  introspection: true,
 });
 
 const { url } = await startStandaloneServer(server, {
