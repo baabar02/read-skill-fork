@@ -115,10 +115,10 @@ export default function ChartPage() {
         </ul>
       </div>
 
-      <CorrectIncorrectPieChart correct={correct} incorrect={incorrect} />
+      {/* <CorrectIncorrectPieChart correct={correct} incorrect={incorrect} />
 
       <TimeLineChart data={lineData} />
-      <SkillAssessmentChart data={analysisData.skillAssessments} />
+      <SkillAssessmentChart data={analysisData.skillAssessments} /> */}
     </div>
   );
 }
