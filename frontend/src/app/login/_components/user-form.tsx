@@ -82,7 +82,7 @@ export default function AuthForm() {
 
       setSuccessMessage(`Амжилттай нэвтэрлээ: ${data.loginUser.user.name}`);
       setName("");
-      router.push("/question");
+      router.push("/user");
       // console.log(setUser, "setUser");
     } catch (error: any) {
       setErrorMessage(error.message || "Нэвтрэхэд алдаа гарлаа.");

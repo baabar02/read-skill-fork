@@ -42,13 +42,13 @@ export default function SkillAssessmentChart({ data }: Props) {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="name"
-            angle={-45}
+            // angle={-45}
             textAnchor="end"
             interval={0}
             height={60}
           />
           <YAxis
-            label={{ value: "Оноо", angle: -90, position: "insideLeft" }}
+          label={{ value: "Оноо", angle: -90, position: "insideLeft" }}
           />
           <Tooltip />
           <Legend />
