@@ -1,4 +1,6 @@
+
 "use client";
+
 import React from "react";
 import {
   BarChart,
@@ -12,27 +14,23 @@ import {
 } from "recharts";
 
 type Props = {
-  data: {
-    name: string;
-    timeAnswer: number;
-    timeDuration: number;
-    isCorrect: string;
-  }[];
+  data: { name: string; timeAnswer: number; timeDuration: number }[];
 };
 
 export default function TimeBarChart({ data }: Props) {
   return (
-    <div className="w-full md:w-[400px] h-64">
-      <h1>Хариултанд зарцуулсан хугацаа</h1>
+    <div className="w-full h-64">
+      <h1 className="text-lg font-medium mb-2">Хариулах хугацаа Бичилттэй</h1>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
-          <YAxis />
+          <YAxis
+            label={{ value: "Time (сек)", angle: -90, position: "insideLeft" }}
+          />
           <Tooltip />
           <Legend />
-
-          <Bar dataKey="timeAnswer" fill="#6366f1" name="Answer Time" />
+          <Bar dataKey="timeAnswer" fill="#3b82f6" name="Answer Time" />
           <Bar dataKey="timeDuration" fill="#10b981" name="Reading Time" />
         </BarChart>
       </ResponsiveContainer>

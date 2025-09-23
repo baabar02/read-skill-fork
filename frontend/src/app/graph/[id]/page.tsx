@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useGenerateUserAnalysisMutation } from "../../../../graphql/generated";
 import { useParams } from "next/navigation";
+import CorrectIncorrectPieChart from "./_components/correct-incorrect";
+import TimeBarChart from "./_components/time-bar-chart";
+import TimeLineChart from "./_components/time-line-chart";
 
 type SkillAssessment = {
   skill: string;
@@ -23,7 +26,7 @@ type Analysis = {
 };
 
 type GenerateUserAnalysisResponse = {
-  analysis: Analysis | null | undefined;
+  analysis: Analysis | null;
   message: string;
   success: boolean;
 };
@@ -47,12 +50,11 @@ export default function ChartPage() {
 
   useEffect(() => {
     if (data?.generateUserAnalysis) {
-      const result: GenerateUserAnalysisResponse = {
-        ...data.generateUserAnalysis,
-        analysis: data.generateUserAnalysis.analysis ?? null,
-      };
+      setMessage(data.generateUserAnalysis.message);
+      setSuccess(data.generateUserAnalysis.success);
 
-      setAnalysisData(result.analysis ?? null);
+      const analysis = data.generateUserAnalysis.analysis ?? null;
+      setAnalysisData(analysis);
     }
   }, [data]);
 
@@ -65,15 +67,31 @@ export default function ChartPage() {
     );
   }
 
+  const total = analysisData.skillAssessments.length;
+  const correct = analysisData.skillAssessments.filter(
+    (sk) => sk.score > 0
+  ).length;
+  const incorrect = total - correct;
+
+  const lineData = analysisData.skillAssessments.map((sk, idx) => ({
+    name: `Q${idx + 1}`,
+    timeAnswer:
+      typeof (sk as any).timeAnswer === "number" ? (sk as any).timeAnswer : 0,
+    timeDuration:
+      typeof (sk as any).timeDuration === "number"
+        ? (sk as any).timeDuration
+        : 0,
+  }));
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6 space-y-6">
       <div className="max-w-4xl w-full bg-white p-6 rounded shadow">
         <h2 className="text-2xl font-semibold mb-4">Анализ</h2>
 
-        <p>Overall Score: {analysisData.overallScore}</p>
-        <p>Confidence: {analysisData.confidence}</p>
+        <p>Нийт оноо: {analysisData.overallScore}</p>
+        <p>Чанар: {analysisData.confidence}</p>
         <p>
-          Analysis Date:{" "}
+          Дүгнэлтийн огноо:{" "}
           {new Date(analysisData.analysisDate).toLocaleDateString()}
         </p>
 
@@ -111,10 +129,14 @@ export default function ChartPage() {
             <li key={i}>{rec}</li>
           ))}
         </ul>
-
-        {/* <p className="mt-6 text-sm text-gray-600">Message: {message}</p>
-        <p>Status: {success ? "Success" : "Failed"}</p> */}
       </div>
+
+      <CorrectIncorrectPieChart correct={correct} incorrect={incorrect} />
+
+      <TimeLineChart data={lineData} />
+
+      <TimeBarChart data={lineData} />
     </div>
   );
+  //
 }

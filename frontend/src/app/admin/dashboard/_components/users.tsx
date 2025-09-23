@@ -1,50 +1,88 @@
-'use client'
+"use client";
 
-import CorrectIncorrectPieChart from '@/app/graph/[id]/_components/correct-incorrect'
+import CorrectIncorrectPieChart from "@/app/graph/[id]/_components/correct-incorrect";
 import {
-  useGetUserProgressQuery,
+  useGenerateUserAnalysisMutation,
   useGetUsersQuery,
-} from '../../../../../graphql/generated'
-import { useParams, useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+} from "../../../../../graphql/generated";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+type SkillAssessment = {
+  skill: string;
+  subSkill?: string | null;
+  score: number;
+  level: string;
+  feedback?: string | null;
+};
+
+type Analysis = {
+  overallScore: number;
+  skillAssessments: SkillAssessment[];
+  strengths: string[];
+  improvements: string[];
+  recommendations: string[];
+  analysisDate: string;
+  confidence: number;
+};
 
 export const UsersInfo = () => {
   const {
     data: usersData,
     loading: usersLoading,
     error: usersError,
-  } = useGetUsersQuery()
-  const router = useRouter()
-  const { id } = useParams()
-  const [selectedUserId, setSelectedUserId] = useState<string | null>()
+  } = useGetUsersQuery();
+  const router = useRouter();
+  const { id } = useParams();
+  const initialSelectedId = Array.isArray(id) ? id[0] : id || null;
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(
+    initialSelectedId
+  );
 
-  const {
-    data: progressData,
-    loading: progressLoading,
-    error: progressError,
-  } = useGetUserProgressQuery({
-    variables: { userId: selectedUserId! },
-    skip: !selectedUserId,
-  })
+  const [analysisMap, setAnalysisMap] = useState<
+    Record<string, SkillAssessment[]>
+  >({});
+
+  const [
+    generateUserAnalysis,
+    { data: analysisData, loading: analysisLoading, error: analysisError },
+  ] = useGenerateUserAnalysisMutation();
+
+  useEffect(() => {
+    if (selectedUserId && !analysisMap[selectedUserId]) {
+      generateUserAnalysis({ variables: { userId: selectedUserId } });
+    }
+  }, [selectedUserId]);
+
+  useEffect(() => {
+    if (
+      analysisData?.generateUserAnalysis?.analysis?.skillAssessments &&
+      selectedUserId
+    ) {
+      setAnalysisMap((prev) => ({
+        ...prev,
+        [selectedUserId]:
+          analysisData?.generateUserAnalysis?.analysis?.skillAssessments || [],
+      }));
+    }
+  }, [analysisData, selectedUserId]);
 
   useEffect(() => {
     if (!selectedUserId && usersData?.getUsers.length) {
-      setSelectedUserId(usersData.getUsers[0].id)
+      setSelectedUserId(usersData.getUsers[0].id);
     }
-  }, [usersData, selectedUserId])
-
-  if (usersLoading || progressLoading)
-    return <p>Loading users and progress...</p>
-  if (usersError) return <p>Error loading users: {usersError.message}</p>
-  if (progressError)
-    return <p>Error loading progress: {progressError.message}</p>
+  }, [usersData, selectedUserId]);
 
   const handleUserClick = (userId: string) => {
-    setSelectedUserId(userId)
-    router.push(`/graph/${userId}`)
-  }
+    setSelectedUserId(userId);
+    router.push(`/graph/${userId}`);
+  };
 
-  const userProgress = progressData?.getUserProgress || []
+  if (usersLoading || analysisLoading)
+    return <p>Loading users and progress...</p>;
+  if (usersError) return <p>Error loading users: {usersError.message}</p>;
+  if (analysisError)
+    return <p>Error loading analysis: {analysisError.message}</p>;
 
   return (
     <div className="w-full mx-auto p-4">
@@ -64,46 +102,41 @@ export const UsersInfo = () => {
           </thead>
           <tbody>
             {usersData?.getUsers.map((user, index) => {
-              const isSelected = user.id === selectedUserId
-              const thisUserProgress =
-                isSelected || selectedUserId === user.id ? userProgress : []
-              const thisTotal = thisUserProgress.length
-              const thisCorrect = thisUserProgress.filter(
-                (p) => p?.isCorrect === true
-              ).length
-              const thisPercentage =
-                thisTotal === 0
-                  ? 0
-                  : Math.round((thisCorrect / thisTotal) * 100)
+              const userProgress = analysisMap[user.id] || [];
+              const total = userProgress.length;
+              const correct = userProgress.filter((p) => p.score > 0).length;
+              const percentage =
+                total === 0 ? 0 : Math.round((correct / total) * 100);
+              const isSelected = user.id === selectedUserId;
 
               return (
                 <tr
                   key={user.id}
                   onClick={() => handleUserClick(user.id)}
                   className={`cursor-pointer transition ${
-                    isSelected ? 'bg-gray-100' : 'hover:bg-gray-50'
+                    isSelected ? "bg-gray-100" : "hover:bg-gray-50"
                   }`}
                 >
                   <td className="border px-4 py-2 text-center">{index + 1}</td>
-                  <td className="border px-4 py-2 text-center">{'2I'}</td>
+                  <td className="border px-4 py-2 text-center">{"2I"}</td>
                   <td className="border px-4 py-2 font-medium text-gray-800">
                     {user.name}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {thisTotal > 0 ? thisTotal : '—'}
+                    {total > 0 ? total : "—"}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {thisTotal > 0 ? thisCorrect : '—'}
+                    {total > 0 ? total : "—"}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {thisTotal > 0 ? `${thisPercentage}%` : '—'}
+                    {total > 0 ? `${percentage}%` : "—"}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {thisTotal > 0 ? (
+                    {total > 0 ? (
                       <div className="w-12 h-12 mx-auto">
                         <CorrectIncorrectPieChart
-                          correct={thisCorrect}
-                          incorrect={thisTotal - thisCorrect}
+                          correct={correct}
+                          incorrect={total - correct}
                         />
                       </div>
                     ) : (
@@ -113,11 +146,11 @@ export const UsersInfo = () => {
                     )}
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </div>
     </div>
-  )
-}
+  );
+};
