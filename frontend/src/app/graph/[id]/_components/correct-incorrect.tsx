@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   PieChart,
@@ -26,11 +27,12 @@ export default function CorrectIncorrectPieChart({
   ];
 
   return (
-    <div className="w-72 h-72"  >
-        <h1>Зөв хариултийн үзүүлэлт</h1>
+    <div className="w-72 h-72">
+      <h1 className="text-lg font-medium mb-2 text-center">
+        Зөв/Буруу Хариултууд
+      </h1>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-       
           <Pie
             data={data}
             dataKey="value"

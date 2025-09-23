@@ -22,7 +22,7 @@ export type AiAnalysis = {
   analysisDate: Scalars['String']['output'];
   confidence: Scalars['Float']['output'];
   improvements: Array<Scalars['String']['output']>;
-  overallScore: Scalars['Int']['output'];
+  overallScore: Scalars['Float']['output'];
   recommendations: Array<Scalars['String']['output']>;
   skillAssessments: Array<SkillAssessment>;
   strengths: Array<Scalars['String']['output']>;
@@ -390,7 +390,7 @@ export type SkillAssessment = {
   __typename?: 'SkillAssessment';
   feedback: Scalars['String']['output'];
   level: Scalars['String']['output'];
-  score: Scalars['Int']['output'];
+  score: Scalars['Float']['output'];
   skill: Scalars['String']['output'];
   subSkill: Scalars['String']['output'];
 };
