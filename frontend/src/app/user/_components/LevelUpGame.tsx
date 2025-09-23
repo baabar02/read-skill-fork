@@ -17,10 +17,18 @@ const LevelUpGame = () => {
       transition={{ duration: 0.5 }}
       className="w-full max-w-xl mx-auto p-4"
     >
-      <Card className="w-full max-w-xl h-[32rem] mx-auto bg-white/40 backdrop-blur-md border border-gray-200 shadow-lg flex flex-col justify-between p-6 rounded-full">
+      <Card className="w-full max-w-xl h-[32rem] mx-auto bg-white/40 backdrop-blur-md border border-gray-200 shadow-lg flex flex-col justify-between p-6 ">
         <CardHeader className="text-center">
-          <div className="text-black px-6 py-2 rounded-full shadow-md inline-block">
-            <CardTitle className="text-3xl md:text-4xl">
+          <div className="text-black px-6 py-2 ">
+            <CardTitle
+              className="text-2xl md:text-3xl lg:text-4xl text-center 
+  bg-gradient-to-r 
+  from-red-500 
+  via-blue-400 
+  to-purple-500 
+  bg-clip-text text-transparent"
+            >
+              {' '}
               Уншдаг Баатар
             </CardTitle>
           </div>
@@ -36,12 +44,14 @@ const LevelUpGame = () => {
             />
           </div>
         </CardContent>
-        <div className="sm:mt-4 w-[80%] flex justify-center mr-3.5 sm:mr-4 mx-auto">
-          <Link href="/storyGame" className="w-[80%]">
+        <div className="sm:mt-4 w-full flex justify-center mr-3.5 sm:mr-4 mx-auto">
+          <Link href="/storyGame">
             <Button
               size="lg"
               variant="default"
-              className="w-[80%] py-8 text-xl font-semibold rounded-full shadow-lg hover:scale-105 transition-transform"
+              className="w-full py-8 text-m sm:text-xl font-semibold rounded-full shadow-lg 
+             bg-gradient-to-r from-red-500 via-blue-400 to-purple-500 
+             text-white hover:scale-105 transition-transform"
             >
               Тоголцгооё
             </Button>
