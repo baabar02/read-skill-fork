@@ -2,7 +2,9 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: process.env.NEXT_PUBLIC_BACKEND_URL  ??  "src/graphql/schema.graphql",
+  schema:
+    process.env.NEXT_PUBLIC_BACKEND_URL ??
+    "https://read-backend-tctp.onrender.com/graphql",
   documents: "graphql/**/*.graphql",
   generates: {
     "./graphql/generated.ts": {
