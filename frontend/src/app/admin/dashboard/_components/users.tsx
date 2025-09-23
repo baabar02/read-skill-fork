@@ -48,24 +48,25 @@ export const UsersInfo = () => {
 
   return (
     <div className="w-full mx-auto p-4">
-      <h2 className="text-3xl font-bold text-purple-700 mb-6 text-center">
-        2I Students
-      </h2>
-      <div className="overflow-x-auto rounded-lg shadow">
-        <table className="min-w-full bg-white">
+      <h2 className="text-3xl font-bold mb-6 text-center">Сурагчдын нэрс </h2>
+      <div className="overflow-x-auto rounded-lg shadow border border-gray-300">
+        <table className="min-w-full border-collapse text-sm">
           <thead>
-            <tr className="bg-purple-700 text-white">
-              <th className="py-3 px-4 text-left">Нэр</th>
-              <th className="py-3 px-4 text-center">Нийт асуулт</th>
-              <th className="py-3 px-4 text-center">Зөв хариулт</th>
-              <th className="py-3 px-4 text-center">Хувь</th>
-              <th className="py-3 px-4 text-center">Харагдац</th>
+            <tr>
+              <th className="border px-4 py-2">№</th>
+              <th className="border px-4 py-2">Анги</th>
+              <th className="border px-4 py-2">Овог Нэр</th>
+              <th className="border px-4 py-2">Нийт асуулт</th>
+              <th className="border px-4 py-2">Зөв хариулт</th>
+              <th className="border px-4 py-2">Хувь</th>
+              <th className="border px-4 py-2">Харагдац</th>
             </tr>
           </thead>
           <tbody>
-            {usersData?.getUsers.map((user) => {
+            {usersData?.getUsers.map((user, index) => {
               const isSelected = user.id === selectedUserId
-              const thisUserProgress = isSelected ? userProgress : []
+              const thisUserProgress =
+                isSelected || selectedUserId === user.id ? userProgress : []
               const thisTotal = thisUserProgress.length
               const thisCorrect = thisUserProgress.filter(
                 (p) => p?.isCorrect === true
@@ -80,22 +81,24 @@ export const UsersInfo = () => {
                   key={user.id}
                   onClick={() => handleUserClick(user.id)}
                   className={`cursor-pointer transition ${
-                    isSelected ? 'bg-purple-100' : 'hover:bg-gray-100'
+                    isSelected ? 'bg-gray-100' : 'hover:bg-gray-50'
                   }`}
                 >
-                  <td className="py-3 px-4 font-medium text-gray-800">
+                  <td className="border px-4 py-2 text-center">{index + 1}</td>
+                  <td className="border px-4 py-2 text-center">{'2I'}</td>
+                  <td className="border px-4 py-2 font-medium text-gray-800">
                     {user.name}
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="border px-4 py-2 text-center">
                     {thisTotal > 0 ? thisTotal : '—'}
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="border px-4 py-2 text-center">
                     {thisTotal > 0 ? thisCorrect : '—'}
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="border px-4 py-2 text-center">
                     {thisTotal > 0 ? `${thisPercentage}%` : '—'}
                   </td>
-                  <td className="py-3 px-4 text-center">
+                  <td className="border px-4 py-2 text-center">
                     {thisTotal > 0 ? (
                       <div className="w-12 h-12 mx-auto">
                         <CorrectIncorrectPieChart

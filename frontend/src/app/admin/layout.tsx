@@ -2,13 +2,7 @@
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar'
-import {
-  Backpack,
-  LayoutDashboard,
-  LibraryBig,
-  LogOut,
-  Settings,
-} from 'lucide-react'
+import { LayoutDashboard, LibraryBig, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import ApolloWrapper from '../providers/ApolloWrapper'
