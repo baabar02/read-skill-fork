@@ -14,6 +14,7 @@ type UserProgress = {
   timeDuration: Number;
   timeAnswer: Number;
   explanation?: string;
+  
 };
 
 const UserProgressSchema = new Schema<UserProgress>(
