@@ -1,6 +1,9 @@
 // codegen.vercel.ts - Vercel-specific configuration
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
+console.log("🔧 Using Vercel-specific codegen configuration");
+console.log("📁 Schema file: ./src/graphql/schema.graphql");
+
 const config: CodegenConfig = {
   schema: "./src/graphql/schema.graphql", // Always use local schema on Vercel
   documents: "graphql/**/*.graphql",

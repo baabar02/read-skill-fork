@@ -3,8 +3,7 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 // Try to use remote schema first, fallback to local schema
 const remoteSchemaUrl =
-  process.env.NEXT_PUBLIC_BACKEND_URL ??
-  "https://read-backend-tctp.onrender.com/graphql";
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "https://echo-mind-fizz.onrender.com";
 const localSchemaPath = "./src/graphql/schema.graphql";
 
 // Determine schema source - use local schema for production builds
