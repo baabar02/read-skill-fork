@@ -4,8 +4,13 @@ import { typeDefs } from "./schemas/common.schema";
 import { resolvers } from "./resolvers";
 import { connectToDb } from "./utils/connect-to-db";
 import jwt from "jsonwebtoken";
+import cors from "cors";
+import { corsConfig } from "./cors-config";
+import express from "express";
 
 connectToDb();
+const app = express();
+app.use(cors(corsConfig));
 
 interface MyContext {
   userId?: string;
