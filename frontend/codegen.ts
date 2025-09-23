@@ -2,20 +2,20 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "src/graphql/schema.graphql",
-  documents: "graphql/**/*.graphql",
+  schema: "src/graphql/**/*.graphql", 
   generates: {
-    "./graphql/generated.ts": {
+    "./src/generated/graphql.ts": {
       plugins: [
         "typescript",
-        "typescript-operations",
-        "typescript-react-apollo",
+        "typescript-resolvers",
       ],
       config: {
-        withHooks: true,
-        reactApolloVersion: 3,
-        withSuspense: false,
-        useSuspenseQuery: false,
+        useIndexSignature: true,
+        contextType: "./context#Context", 
+        mappers: {
+
+          Question: "../models/question-model#IQuestion",
+        },
       },
     },
   },
