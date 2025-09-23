@@ -1,16 +1,13 @@
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import { expressMiddleware } from "@apollo/server/express4";
 import { typeDefs } from "./schemas/common.schema";
 import { resolvers } from "./resolvers";
 import { connectToDb } from "./utils/connect-to-db";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { corsConfig } from "./cors-config";
 import express from "express";
 
 connectToDb();
-const app = express();
-app.use(cors(corsConfig));
 
 interface MyContext {
   userId?: string;
@@ -22,8 +19,23 @@ const server = new ApolloServer<MyContext>({
   introspection: true,
 });
 
-const { url } = await startStandaloneServer(server, {
-  listen: { port: Number(process.env.PORT || 4200) },
+await server.start();
+
+const app = express();
+
+// Enable CORS for all origins
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// Parse JSON bodies
+app.use(express.json());
+
+// GraphQL endpoint
+app.use('/graphql', expressMiddleware(server, {
   context: async ({ req }): Promise<MyContext> => {
     const token = req.headers.authorization?.replace("Bearer ", "") || "";
     let userId: string | undefined;
@@ -39,6 +51,9 @@ const { url } = await startStandaloneServer(server, {
 
     return { userId };
   },
-});
+}));
 
-console.log(`🚀 Apollo Server ready at ${url}`);
+const port = Number(process.env.PORT || 4200);
+app.listen(port, () => {
+  console.log(`🚀 Apollo Server ready at http://localhost:${port}/graphql`);
+});
