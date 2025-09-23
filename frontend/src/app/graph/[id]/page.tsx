@@ -7,6 +7,8 @@ import CorrectIncorrectPieChart from "./_components/correct-incorrect";
 import TimeBarChart from "./_components/skill-assessment-chart";
 import TimeLineChart from "./_components/time-line-chart";
 import SkillAssessmentChart from "./_components/skill-assessment-chart";
+import Lottie from "lottie-react";
+import loading from "@/assets/illustrations/loading.json";
 
 type SkillAssessment = {
   skill: string;
@@ -52,7 +54,13 @@ export default function ChartPage() {
 
   if (!analysisData) {
     return (
-      <div>Анализ хийж байна. {message && `Message: ${message}`}</div>
+    <Lottie
+              animationData={loading}
+              loop
+              autoplay
+              style={{ width: 500, height: 500 }}
+              className="flex justify-center items-center mx-auto"
+            />
     );
   }
 
