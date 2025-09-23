@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useGenerateUserAnalysisMutation } from "../../../../graphql/generated";
 import { useParams } from "next/navigation";
 import CorrectIncorrectPieChart from "./_components/correct-incorrect";
-import TimeBarChart from "./_components/time-bar-chart";
+import TimeBarChart from "./_components/skill-assessment-chart";
 import TimeLineChart from "./_components/time-line-chart";
+import SkillAssessmentChart from "./_components/skill-assessment-chart";
 
 type SkillAssessment = {
   skill: string;
@@ -13,6 +14,8 @@ type SkillAssessment = {
   score: number;
   level: string;
   feedback?: string | null;
+  timeSpent?: number;
+  attemptCount?: number;
 };
 
 type Analysis = {
@@ -23,12 +26,6 @@ type Analysis = {
   recommendations: string[];
   analysisDate: string;
   confidence: number;
-};
-
-type GenerateUserAnalysisResponse = {
-  analysis: Analysis | null;
-  message: string;
-  success: boolean;
 };
 
 export default function ChartPage() {
@@ -75,12 +72,8 @@ export default function ChartPage() {
 
   const lineData = analysisData.skillAssessments.map((sk, idx) => ({
     name: `Q${idx + 1}`,
-    timeAnswer:
-      typeof (sk as any).timeAnswer === "number" ? (sk as any).timeAnswer : 0,
-    timeDuration:
-      typeof (sk as any).timeDuration === "number"
-        ? (sk as any).timeDuration
-        : 0,
+    timeSpent: sk.timeSpent ?? 0,
+    attemptCount: sk.attemptCount ?? 0,
   }));
 
   return (
@@ -134,9 +127,7 @@ export default function ChartPage() {
       <CorrectIncorrectPieChart correct={correct} incorrect={incorrect} />
 
       <TimeLineChart data={lineData} />
-
-      <TimeBarChart data={lineData} />
+      <SkillAssessmentChart data={analysisData.skillAssessments} />
     </div>
   );
-  //
 }

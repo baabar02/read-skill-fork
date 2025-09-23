@@ -13,7 +13,7 @@ import {
 } from "recharts";
 
 type Props = {
-  data: { name: string; timeAnswer: number; timeDuration: number }[];
+  data: { name: string; timeSpent: number; attemptCount: number }[];
 };
 
 export default function TimeLineChart({ data }: Props) {
@@ -31,15 +31,15 @@ export default function TimeLineChart({ data }: Props) {
           <Legend />
           <Line
             type="monotone"
-            dataKey="timeAnswer"
+            dataKey="attemptCount"
             stroke="#3b82f6"
-            name="Answer Time"
+            name="Answer Attempts"
           />
           <Line
             type="monotone"
-            dataKey="timeDuration"
+            dataKey="timeSpent"
             stroke="#10b981"
-            name="Reading Time"
+            name="Time Spent (сек)"
           />
         </LineChart>
       </ResponsiveContainer>
