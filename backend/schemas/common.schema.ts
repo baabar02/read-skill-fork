@@ -61,13 +61,13 @@ export const typeDefs = `
   type SkillAssessment {
     skill: String!
     subSkill: String!
-    score: Int!           
+    score: Float!           
     level: String!        
     feedback: String!     
   }
 
   type AIAnalysis {
-    overallScore: Int!              
+    overallScore: Float!              
     skillAssessments: [SkillAssessment!]! 
     strengths: [String!]!         
     improvements: [String!]!        

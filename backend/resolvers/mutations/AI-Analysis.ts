@@ -211,21 +211,3 @@ const parseJsonFromText = (text: string) => {
   }
 };
 
-// Mutation/Query exports
-// export const aiAnalysisResolvers = {
-//   Query: {
-//     getUserLearningStats,
-//     getUserAIAnalysis: async (_: unknown, args: { userId: string }) => {
-//       const latestAnswer = await AnswerModel.findOne({
-//         userId: args.userId,
-//         aiAnalysis: { $exists: true },
-//       }).sort({ createdAt: -1 });
-
-//       return latestAnswer?.aiAnalysis || null;
-//     },
-//   },
-//   Mutation: {
-//     generateUserAnalysis,
-//     submitAnswer,
-//   },
-// };
