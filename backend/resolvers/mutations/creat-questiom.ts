@@ -3,17 +3,17 @@ import { OpenAI } from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+//
 const parseJsonFromText = (text: string) => {
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start !== -1 && end !== -1) {
-    try {
-      return JSON.parse(text.slice(start, end + 1));
-    } catch {}
-  }
   try {
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start !== -1 && end !== -1 && start < end) {
+      return JSON.parse(text.slice(start, end + 1));
+    }
     return JSON.parse(text);
-  } catch {
+  } catch (err) {
+    console.error("JSON parse failed:", err, "Text length:", text.length);
     throw new Error("AI response parsing failed");
   }
 };
@@ -51,7 +51,7 @@ export const generateQuestionsFromText = async (
     }
 
     const prompt = `
-Чи бол уншлагын ойлголт болон танин мэдэхүйн шалгалтын асуулт зохиодог туслах. Доорх текстээс 4 төрлийн ур чадварыг шалгах асуултууд үүсгэнэ.
+Чи бол хүүхдийн унших чадварыг 4 ур чадвар дээр үндэслэн үнэлэх зорилготой асуулт боловсруулдаг туслах. Өгөгдсөн текстээс 4 төрлийн ур чадварыг шалгах асуултууд үүсгэнэ.
 
 Өгөгдсөн текст: "${text}"
 
@@ -61,8 +61,8 @@ export const generateQuestionsFromText = async (
   "questions": [
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Танин мэдэхүй",
-      "subSkill": "Үг таних",
+      "skill": "Танин мэдэхүйн чадвар",
+      "subSkill": "Үг таних чадвар",
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
         "correctAnswer": "Зөв хариулт",
@@ -71,7 +71,7 @@ export const generateQuestionsFromText = async (
     },
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Танин мэдэхүй",
+      "skill": "Танин мэдэхүйн чадвар",
       "subSkill": "Ой тогтоолт",
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
@@ -81,7 +81,7 @@ export const generateQuestionsFromText = async (
     },
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Танин мэдэхүй",
+      "skill": "Танин мэдэхүйн чадвар",
       "subSkill": "Гол санаа олох",
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
@@ -91,8 +91,8 @@ export const generateQuestionsFromText = async (
     },
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Сэтгэн бодох",
-      "subSkill": "Шалтгаан–үр дагавар",
+      "skill": "Сэтгэн бодох чадвар",
+      "subSkill": "Шалтгаан үр дагавар",
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
         "correctAnswer": "Зөв хариулт",
@@ -101,7 +101,7 @@ export const generateQuestionsFromText = async (
     },
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Сэтгэн бодох", 
+      "skill": "Сэтгэн бодох чадвар", 
       "subSkill": "Төсөөлөл",
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
@@ -111,7 +111,7 @@ export const generateQuestionsFromText = async (
     },
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Харилцаа",
+      "skill": "Харилцааны чадвар",
       "subSkill": "Үгийн баялаг", 
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
@@ -121,14 +121,24 @@ export const generateQuestionsFromText = async (
     },
     {
       "question": "Асуултын өгүүлбэр?",
-      "skill": "Сэтгэл хөдлөл ба нийгмийн",
+      "skill": "Харилцааны чадвар",
+      "subSkill": "Өөрийгөө илэрхийлэх", 
+      "option": {
+        "options": ["Сонголт А", "Сонголт Б", "Сонголт В"],
+        "correctAnswer": "Зөв хариулт",
+        "explanation": "Тайлбар"
+      }
+    },
+    {
+      "question": "Асуултын өгүүлбэр?",
+      "skill": "Сэтгэл хөдлөл ба нийгмийн чадвар",
       "subSkill": "Сэтгэл хөдлөлийг ойлгох",
       "option": {
         "options": ["Сонголт А", "Сонголт Б", "Сонголт В"], 
         "correctAnswer": "Зөв хариулт",
         "explanation": "Тайлбар"
       }
-    }
+    },
   ]
 }
 
@@ -150,7 +160,7 @@ export const generateQuestionsFromText = async (
         },
         { role: "user", content: prompt },
       ],
-      max_tokens: 1000,
+      max_tokens: 2000,
       temperature: 0.1,
     });
 
