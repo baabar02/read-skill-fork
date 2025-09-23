@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { Transcription } from "../../models/audio-model";
-import { Book } from "../../models/book-model";
+import { Question } from "../../models/question-model";
 import { transcribeChimege } from "../../utils/chimege";
 import { compareTextSimilarity } from "../../utils/gemini";
 import dotenv from "dotenv";
@@ -11,14 +11,14 @@ export const transcribeAudio = async (
 ) => {
   const { userId, bookId, audioBase64 } = args;
 
-  const book = await Book.findById(bookId);
+  const book = await Question.findById(bookId);
   if (!book) throw new Error("Book not exist");
 
   const audioBuffer = Buffer.from(audioBase64, "base64");
   const base64String = audioBuffer.toString("base64");
 
   const transcribedText = await transcribeChimege(base64String);
-  const bookContentAsString = book.content.join(" ");
+  const bookContentAsString = book.text;
   const similarityScore = await compareTextSimilarity(
     bookContentAsString,
     transcribedText

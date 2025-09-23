@@ -36,31 +36,23 @@ export default function ChartPage() {
   const [message, setMessage] = useState<string>("");
   const [success, setSuccess] = useState<boolean | null>(null);
 
-  const [generateUserAnalysis, { data, loading, error }] =
-    useGenerateUserAnalysisMutation();
+  const [generateUserAnalysis] = useGenerateUserAnalysisMutation();
 
   useEffect(() => {
     if (userId) {
-      generateUserAnalysis({ variables: { userId } });
+      generateUserAnalysis({ variables: { userId } }).then((res: any) => {
+        if (res.data?.generateUserAnalysis?.analysis) {
+          setAnalysisData(res.data.generateUserAnalysis.analysis);
+        }
+        setMessage(res.data?.generateUserAnalysis?.message || "");
+        setSuccess(res.data?.generateUserAnalysis?.success || false);
+      });
     }
   }, [userId, generateUserAnalysis]);
 
-  useEffect(() => {
-    if (data?.generateUserAnalysis) {
-      setMessage(data.generateUserAnalysis.message);
-      setSuccess(data.generateUserAnalysis.success);
-
-      const analysis = data.generateUserAnalysis.analysis ?? null;
-      setAnalysisData(analysis);
-    }
-  }, [data]);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
   if (!analysisData) {
     return (
-      <div>No analysis data available. {message && `Message: ${message}`}</div>
+      <div>Анализ хийж байна. {message && `Message: ${message}`}</div>
     );
   }
 
@@ -82,45 +74,44 @@ export default function ChartPage() {
         <h2 className="text-2xl font-semibold mb-4">Анализ</h2>
 
         <p>Нийт оноо: {analysisData.overallScore}</p>
-        <p>Чанар: {analysisData.confidence}</p>
-        <p>
-          Дүгнэлтийн огноо:{" "}
-          {new Date(analysisData.analysisDate).toLocaleDateString()}
-        </p>
 
-        <h3 className="mt-4 font-semibold">Skill Assessments</h3>
-        <ul className="list-disc list-inside">
-          {analysisData.skillAssessments.map((skill, i) => (
-            <li key={i}>
-              <strong>{skill.skill}</strong>
-              {skill.subSkill ? ` / ${skill.subSkill}` : ""}: {skill.score} (
-              {skill.level})
-              {skill.feedback && (
-                <p className="ml-4 italic">{skill.feedback}</p>
-              )}
-            </li>
-          ))}
-        </ul>
+        <h3 className="mt-4 font-semibold">Ур чадварын үнэлгээ</h3>
+        {analysisData.skillAssessments.length > 0 && (
+          <div>
+            {Object.entries(
+              analysisData.skillAssessments.reduce((acc, curr) => {
+                if (!acc[curr.skill]) acc[curr.skill] = [];
+                acc[curr.skill].push(curr);
+                return acc;
+              }, {} as Record<string, SkillAssessment[]>)
+            ).map(([skillName, subSkills]) => (
+              <div key={skillName} className="mb-3">
+                <strong className="text-lg">{skillName}</strong>
+                <ul className="list-disc list-inside ml-4">
+                  {subSkills.map((subSkill, idx) => (
+                    <li key={idx}>
+                      {subSkill.subSkill ? `${subSkill.subSkill}: ` : ""}
+                      {subSkill.score} ({subSkill.level})
+                      {subSkill.feedback && (
+                        <p className="ml-4 italic">{subSkill.feedback}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <h3 className="mt-4 font-semibold">Strengths</h3>
-        <ul className="list-disc list-inside">
-          {analysisData.strengths.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ul>
+        <h3 className="mt-4 font-semibold">Сайн ур чадвар</h3>
+        <ul className="list-disc list-inside">{analysisData.strengths}</ul>
 
-        <h3 className="mt-4 font-semibold">Improvements</h3>
-        <ul className="list-disc list-inside">
-          {analysisData.improvements.map((imp, i) => (
-            <li key={i}>{imp}</li>
-          ))}
-        </ul>
+        <h3 className="mt-4 font-semibold">Ажиллах ур чадвар</h3>
+        <ul className="list-disc list-inside">{analysisData.improvements}</ul>
 
-        <h3 className="mt-4 font-semibold">Recommendations</h3>
+        <h3 className="mt-4 font-semibold">Зөвлөмж</h3>
         <ul className="list-disc list-inside">
-          {analysisData.recommendations.map((rec, i) => (
-            <li key={i}>{rec}</li>
-          ))}
+          {analysisData.recommendations}
         </ul>
       </div>
 

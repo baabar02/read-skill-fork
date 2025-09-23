@@ -21,7 +21,7 @@ const TranscriptionSchema = new Schema<TranscriptionType>(
     bookId: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "Book", // 'Book' гэсэн цуглуулгатай холбоно.
+      ref: "Question", // 'Book' гэсэн цуглуулгатай холбоно.
     },
     text: {
       type: String,

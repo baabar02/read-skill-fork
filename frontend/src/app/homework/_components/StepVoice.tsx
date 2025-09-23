@@ -87,7 +87,7 @@ export default function StepVoice({ onFinish }: StepVoiceProps) {
             const { data } = await transcribeAudio({
               variables: {
                 userId: "68c7a0a49f6ae7515b7f0508",
-                bookId: "68c7a4a33571925f591602ea",
+                bookId: "68d20833b7dfb4a2bf35d7be",
                 audioBase64: base64data,
               },
             });
