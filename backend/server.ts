@@ -1,11 +1,10 @@
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
+import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./schemas/common.schema";
 import { resolvers } from "./resolvers";
 import { connectToDb } from "./utils/connect-to-db";
 import jwt from "jsonwebtoken";
-import cors from "cors";
-import express from "express";
+import type { IncomingMessage, ServerResponse } from "http";
 
 connectToDb();
 
@@ -19,24 +18,26 @@ const server = new ApolloServer<MyContext>({
   introspection: true,
 });
 
-await server.start();
+const { url } = await startStandaloneServer(server, {
+  listen: { port: Number(process.env.PORT || 4200) },
+  context: async ({ req, res }: { req: IncomingMessage; res: ServerResponse }): Promise<MyContext> => {
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.setHeader("Access-Control-Max-Age", "86400");
+      res.writeHead(200);
+      res.end();
+      return { userId: undefined };
+    }
 
-const app = express();
+    // Add CORS headers for all requests
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-// Enable CORS for all origins
-app.use(cors({
-  origin: true, // Allow all origins
-  credentials: true,
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-// Parse JSON bodies
-app.use(express.json());
-
-// GraphQL endpoint
-app.use('/graphql', expressMiddleware(server, {
-  context: async ({ req }): Promise<MyContext> => {
     const token = req.headers.authorization?.replace("Bearer ", "") || "";
     let userId: string | undefined;
 
@@ -51,9 +52,6 @@ app.use('/graphql', expressMiddleware(server, {
 
     return { userId };
   },
-}));
-
-const port = Number(process.env.PORT || 4200);
-app.listen(port, () => {
-  console.log(`🚀 Apollo Server ready at http://localhost:${port}/graphql`);
 });
+
+console.log(`🚀 Apollo Server ready at ${url}`);
