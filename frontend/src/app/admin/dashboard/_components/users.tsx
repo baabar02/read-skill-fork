@@ -7,6 +7,8 @@ import {
 } from "../../../../../graphql/generated";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import loading from "@/assets/illustrations/loading.json";
+import Lottie from "lottie-react";
 
 type SkillAssessment = {
   skill: string;
@@ -90,7 +92,13 @@ useEffect(() => {
   };
 
   if (usersLoading || analysisLoading)
-    return <p>Loading users and progress...</p>;
+    return <Lottie
+              animationData={loading}
+              loop
+              autoplay
+              style={{ width: 500, height: 500 }}
+              className="flex justify-center items-center mx-auto"
+            />
   if (usersError) return <p>Error loading users: {usersError.message}</p>;
   if (analysisError)
     return <p>Error loading analysis: {analysisError.message}</p>;
