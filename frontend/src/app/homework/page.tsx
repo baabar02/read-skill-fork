@@ -5,7 +5,7 @@ import Lottie from "lottie-react";
 import Confetti from "react-confetti";
 import StepRead from "./_components/StepRead";
 import StepQuestion from "./_components/StepQuestion";
-import StepPuzle from "./_components/StepPuzle";
+
 import StepVoice from "./_components/StepVoice";
 import RobotAnim from "@/assets/illustrations/Robot-Bot-3D.json";
 import Link from "next/link";
@@ -65,11 +65,11 @@ export default function HomeWorkPage() {
           />
         )}
 
-        {step === 3 && <StepPuzle onFinish={() => setStep(4)} />}
+       
 
-        {step === 4 && <StepVoice onFinish={() => setStep(5)} />}
+        {step === 3 && <StepVoice onFinish={() => setStep(4)} />}
 
-        {step === 5 && (
+        {step === 4 && (
           <>
             <Confetti
               width={windowSize.width}
@@ -89,7 +89,7 @@ export default function HomeWorkPage() {
                     onClick={() => "GO товч дарагдлаа!"}
                     className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow transition"
                   >
-                    GO
+                    Урагшаа
                   </button>
                 </Link>
               </div>

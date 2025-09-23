@@ -70,7 +70,7 @@ export default function LandingPage() {
           transition={{ duration: 0.7, delay: 0.3 }}
           className="text-4xl md:text-5xl font-extrabold text-indigo-700 drop-shadow-lg leading-snug"
         >
-          Сайн уу! Эх хэлээ уншиж <br /> ойлгох чадвараа хөгжүүл!
+          Сайн уу? Эх хэлээ уншиж <br /> ойлгох чадвараа хөгжүүл!
         </motion.h1>
       </section>
 
