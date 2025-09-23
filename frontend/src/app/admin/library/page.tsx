@@ -1,11 +1,11 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Topics } from "./_Components/Topics";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+
+import { AddTopic } from "./create-topic/_Components/AddTopic";
 
 const Library = () => {
   const router = useRouter();
@@ -17,18 +17,11 @@ const Library = () => {
       <CardContent>
         <CardHeader className="flex justify-between items-center">
           <CardTitle>Өгүүллэгүүд</CardTitle>
-          <Button
-            type="button"
-            onClick={handlePush}
-            className="bg-[#737373]/60 backdrop-blur-xl border-white/10"
-          >
-            <Plus />
-            Өгүүллэг нэмэх
-          </Button>
+          
         </CardHeader>
       </CardContent>
 
-      <Topics />
+    <AddTopic />
     </Card>
   );
 };

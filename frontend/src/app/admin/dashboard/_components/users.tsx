@@ -39,6 +39,17 @@ export const UsersInfo = () => {
     initialSelectedId
   );
 
+const [selectedUserAnalysis, setSelectedUserAnalysis] = useState<Analysis | null>(null);
+
+
+useEffect(() => {
+  if (selectedUserId && analysisData?.generateUserAnalysis?.analysis) {
+    setSelectedUserAnalysis(analysisData.generateUserAnalysis.analysis);
+  } else {
+    setSelectedUserAnalysis(null);
+  }
+}, [selectedUserId, ]);
+
   const [analysisMap, setAnalysisMap] = useState<
     Record<string, SkillAssessment[]>
   >({});
@@ -62,7 +73,7 @@ export const UsersInfo = () => {
       setAnalysisMap((prev) => ({
         ...prev,
         [selectedUserId]:
-          analysisData?.generateUserAnalysis?.analysis?.skillAssessments || [],
+          analysisData?.generateUserAnalysis?.analysis?.skillAssessments  || [],
       }));
     }
   }, [analysisData, selectedUserId]);
@@ -132,7 +143,10 @@ export const UsersInfo = () => {
                     {total > 0 ? `${percentage}%` : "—"}
                   </td>
                   <td className="border px-4 py-2 text-center">
-                    {total > 0 ? (
+                  {selectedUserAnalysis?.recommendations}
+                  </td>
+                  <td className="border px-4 py-2 text-center">
+                    {/* {total > 0 ? (
                       <div className="w-12 h-12 mx-auto">
                         <CorrectIncorrectPieChart
                           correct={correct}
@@ -143,7 +157,7 @@ export const UsersInfo = () => {
                       <span className="text-gray-500 text-sm">
                         Оноо байхгүй
                       </span>
-                    )}
+                    )} */}
                   </td>
                 </tr>
               );

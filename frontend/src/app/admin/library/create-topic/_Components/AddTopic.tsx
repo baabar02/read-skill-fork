@@ -23,11 +23,11 @@ type FormType = z.infer<typeof formSchema>;
 const formSchema = z.object({
   title: z.string().nonempty("Өгүүллэгийн гарчигийг оруулна уу"),
   text: z.string().nonempty("Өгүүллэгээ оруулна уу"),
-  maxQuestions: z
-    .number()
-    .min(1, "Хамгийн багадаа 1 асуулт байна")
-    .max(8, "Хамгийн ихдээ 8 асуулт зохиогдоно")
-    .optional(),
+  // maxQuestions: z
+  //   .number()
+  //   .min(1, "Хамгийн багадаа 1 асуулт байна")
+  //   .max(8, "Хамгийн ихдээ 8 асуулт зохиогдоно")
+  //   .optional(),
 });
 
 export const AddTopic = () => {
@@ -51,7 +51,7 @@ export const AddTopic = () => {
     defaultValues: {
       title: "",
       text: "",
-      maxQuestions: undefined,
+      // maxQuestions: undefined,
     },
   });
 
@@ -61,7 +61,7 @@ export const AddTopic = () => {
         variables: {
           title: values.title,
           text: values.text,
-          maxQuestions: values.maxQuestions,
+          // maxQuestions: values.maxQuestions,
         },
       });
 
@@ -74,7 +74,7 @@ export const AddTopic = () => {
   };
 
   return (
-    <Card className="scroll-my-2.5">
+    <Card className="scroll-y h-[90vh] overflow-y-auto">
       <CardContent>
         <Form {...form}>
           <form
@@ -109,7 +109,7 @@ export const AddTopic = () => {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="maxQuestions"
               render={({ field }) => (
@@ -132,10 +132,10 @@ export const AddTopic = () => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <Button type="submit" className="flex items-end">
-              Өгүүллэг нэмэх
+              Асуулт үүсгэх
             </Button>
           </form>
         </Form>
