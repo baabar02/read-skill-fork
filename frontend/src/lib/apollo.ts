@@ -5,7 +5,7 @@ import { InMemoryCache } from "@apollo/client";
 const publicBackendUrl =
   process.env.NEXT_PUBLIC_BACKEND_URL ??
   (process.env.NODE_ENV === "production"
-    ? "https://read-backend-tctp.onrender.com"
+    ? "https://echo-mind-fizz.onrender.com"
     : "http://localhost:4200");
 
 console.log("🔧 Apollo Client Configuration:");
