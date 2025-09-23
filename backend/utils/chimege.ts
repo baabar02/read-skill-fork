@@ -14,6 +14,9 @@ export const transcribeChimege = async (
   // Base64 string-ийг Buffer болгон хувиргах.
   const audioBuffer: Buffer = Buffer.from(audioBase64, "base64");
 
+  // console.log("Buffer size in bytes:", audioBuffer.length);
+
+
   try {
     const response: Response = await fetch(chimegeApiUrl, {
       method: "POST",
