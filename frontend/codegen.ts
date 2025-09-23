@@ -7,11 +7,22 @@ const remoteSchemaUrl =
   "https://read-backend-tctp.onrender.com/graphql";
 const localSchemaPath = "./src/graphql/schema.graphql";
 
+// Determine schema source - use local schema for production builds
+const useLocalSchema =
+  process.env.NODE_ENV === "production" || process.env.VERCEL || process.env.CI;
+
+console.log("🔧 GraphQL Codegen Configuration:");
+console.log("- NODE_ENV:", process.env.NODE_ENV);
+console.log("- VERCEL:", process.env.VERCEL);
+console.log("- CI:", process.env.CI);
+console.log("- Using local schema:", useLocalSchema);
+console.log(
+  "- Schema path:",
+  useLocalSchema ? localSchemaPath : remoteSchemaUrl
+);
+
 const config: CodegenConfig = {
-  schema:
-    process.env.NODE_ENV === "production" && process.env.VERCEL
-      ? localSchemaPath // Use local schema in production builds
-      : remoteSchemaUrl, // Use remote schema in development
+  schema: useLocalSchema ? localSchemaPath : remoteSchemaUrl,
   documents: "graphql/**/*.graphql",
   generates: {
     "./graphql/generated.ts": {

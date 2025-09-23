@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "bun run codegen || echo 'Codegen failed, continuing with build...' && next build",
+    "build": "bun run codegen:vercel || echo 'Codegen failed, continuing with build...' && next build",
     "build:force": "bun run codegen && next build",
     "start": "next start",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:vercel": "graphql-codegen --config codegen.vercel.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.11.0",
