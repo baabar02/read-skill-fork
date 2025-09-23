@@ -67,9 +67,9 @@ export default function UserProgressChart({
         </div>
       </div>
 
-      {/* Recommendations-г жагсаалтаар харуулах */}
+     
       <div className="bg-white p-4 rounded shadow">
-        <h3 className="text-xl font-semibold mb-2">Recommendations</h3>
+        <h3 className="text-xl font-semibold mb-2">Сайжруулах зөвөлгөө</h3>
         <ul className="list-disc list-inside space-y-1">
           {recommendations.map((rec, i) => (
             <li key={i}>{rec}</li>
