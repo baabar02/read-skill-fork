@@ -10,7 +10,10 @@
     "ts-node-dev": "^2.0.0"
   },
   "scripts": {
-    "start": "bun run server.ts"
+    "start": "bun run server.ts",
+     "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "build": "tsc"
+
   },
   "peerDependencies": {
     "typescript": "^5.9.2"
