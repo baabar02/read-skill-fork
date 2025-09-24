@@ -4,7 +4,7 @@ import { Question } from "../../models/question-model";
 export const submitAnswer = async (
   _: unknown,
   args: {
-    questionId: string;
+    questionId: string; // questions массивын _id
     userAnswer: string;
     selectedOption?: string;
     metadata?: {
@@ -20,29 +20,33 @@ export const submitAnswer = async (
     const { questionId, userAnswer, selectedOption, metadata } = args;
     const { userId } = context;
 
-    // Question-г олох
-    const question = await Question.findById(questionId);
-    if (!question) {
-      throw new Error("Асуулт олдсонгүй");
-    }
+    // 1. MongoDB-с тухайн асуултыг агуулсан document-ийг олох
+    const questionDoc = await Question.findOne({
+      "questions._id": questionId,
+    });
 
-    // Зөв хариулттай тулгах
-    const correctAnswer = question.questions?.[0]?.option?.correctAnswer;
+    if (!questionDoc) throw new Error("Асуулт олдсонгүй");
+
+    // 2. Массив дотроос тухайн асуултыг олох
+    const currentQuestion = questionDoc.questions.find(
+      (q) => q._id.toString() === questionId
+    );
+
+    if (!currentQuestion) throw new Error("Асуулт олдсонгүй");
+
+    // 3. Зөв хариулттай харьцуулах
+    const correctAnswer = currentQuestion.option?.correctAnswer;
     const isCorrect =
       userAnswer.toLowerCase().trim() === correctAnswer?.toLowerCase().trim();
 
-    const option = question.questions?.[0]?.option;
-
-    // Option эсвэл correctAnswer байхгүй бол null эсвэл тохирсон утга буцаах
-    const safeOption = option && option.correctAnswer ? option : null;
-
+    
     const answer = new AnswerModel({
       questionId,
       userId,
       answer: userAnswer,
       isCorrect,
       selectedOption,
-      option: safeOption,
+      option: currentQuestion.option || null,
       answerMetadata: metadata
         ? {
             timeSpent: metadata.timeSpent || 0,
@@ -53,7 +57,7 @@ export const submitAnswer = async (
         : undefined,
     });
 
-    await answer.save();
+    await answer.save(); // ✅ Энэ алхам нь MongoDB-д хадгалах
 
     return answer;
   } catch (error: any) {

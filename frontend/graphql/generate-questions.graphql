@@ -9,6 +9,7 @@ mutation GenerateQuestionsFromText(
     maxQuestions: $maxQuestions
   ) {
     questions {
+     
       question
       skill
       subSkill
@@ -20,6 +21,6 @@ mutation GenerateQuestionsFromText(
     }
     text
     title
-    _id
+    id
   }
 }

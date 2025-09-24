@@ -35,12 +35,14 @@ export const typeDefs = `
   }
   
   type QuestionOption {
+    _id: ID!
     options: [String!]!
     explanation: String!
     correctAnswer: String!
   }
 
   type GeneratedQuestion {
+    _id: ID!
     question: String!
     skill: String  
     subSkill: String  
@@ -61,13 +63,13 @@ export const typeDefs = `
   type SkillAssessment {
     skill: String!
     subSkill: String!
-    score: Float!           
+    score: Int!           
     level: String!        
     feedback: String!     
   }
 
   type AIAnalysis {
-    overallScore: Float!              
+    overallScore: Int!              
     skillAssessments: [SkillAssessment!]! 
     strengths: [String!]!         
     improvements: [String!]!        
