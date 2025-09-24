@@ -106,7 +106,7 @@ const questions: Question[] =
     try {
       const res = await submitAnswer({
         variables: {
-          questionId, // sub-question _id
+          questionId,
           userAnswer: answers[currentIndex],
           selectedOption: answers[currentIndex],
           metadata: {

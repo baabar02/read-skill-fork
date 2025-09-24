@@ -9,7 +9,7 @@ mutation GenerateQuestionsFromText(
     maxQuestions: $maxQuestions
   ) {
     questions {
-     
+    
       question
       skill
       subSkill
