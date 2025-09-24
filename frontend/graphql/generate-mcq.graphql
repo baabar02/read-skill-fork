@@ -16,7 +16,7 @@ mutation GenerateMCQQuestions(
     language: $language
     answer: $answer
   ) {
-    id
+    _id
     title
     text
     questions {
