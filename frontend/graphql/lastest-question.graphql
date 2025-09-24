@@ -1,10 +1,10 @@
 query LatestQuestion {
   latestQuestion {
-    id
+    _id
     title
     text
     questions {
-       _id
+      _id
       question
       skill
       subSkill
