@@ -22,7 +22,7 @@ export type AiAnalysis = {
   analysisDate: Scalars['String']['output'];
   confidence: Scalars['Float']['output'];
   improvements: Array<Scalars['String']['output']>;
-  overallScore: Scalars['Float']['output'];
+  overallScore: Scalars['Int']['output'];
   recommendations: Array<Scalars['String']['output']>;
   skillAssessments: Array<SkillAssessment>;
   strengths: Array<Scalars['String']['output']>;
@@ -117,6 +117,7 @@ export type DeleteResponse = {
 
 export type GeneratedQuestion = {
   __typename?: 'GeneratedQuestion';
+  _id: Scalars['ID']['output'];
   option: QuestionOption;
   question: Scalars['String']['output'];
   skill?: Maybe<Scalars['String']['output']>;
@@ -368,6 +369,7 @@ export type Question = {
 
 export type QuestionOption = {
   __typename?: 'QuestionOption';
+  _id: Scalars['ID']['output'];
   correctAnswer: Scalars['String']['output'];
   explanation: Scalars['String']['output'];
   options: Array<Scalars['String']['output']>;
@@ -389,7 +391,7 @@ export type SkillAssessment = {
   __typename?: 'SkillAssessment';
   feedback: Scalars['String']['output'];
   level: Scalars['String']['output'];
-  score: Scalars['Float']['output'];
+  score: Scalars['Int']['output'];
   skill: Scalars['String']['output'];
   subSkill: Scalars['String']['output'];
 };
@@ -579,7 +581,7 @@ export type GetUsersFromUserFileQuery = { __typename?: 'Query', getUsers: Array<
 export type LatestQuestionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LatestQuestionQuery = { __typename?: 'Query', latestQuestion?: { __typename?: 'Question', _id: string, title: string, text: string, createdAt: string, updatedAt: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill?: string | null, subSkill?: string | null, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } | null };
+export type LatestQuestionQuery = { __typename?: 'Query', latestQuestion?: { __typename?: 'Question', _id: string, title: string, text: string, createdAt: string, updatedAt: string, questions: Array<{ __typename?: 'GeneratedQuestion', _id: string, question: string, skill?: string | null, subSkill?: string | null, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } | null };
 
 export type LoginUserMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -1267,6 +1269,7 @@ export const LatestQuestionDocument = gql`
     title
     text
     questions {
+      _id
       question
       skill
       subSkill
