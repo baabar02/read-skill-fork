@@ -16,8 +16,8 @@ export default function StepRead({ onFinish }: StepReadProps) {
   const { data, loading, error } = useLatestQuestionQuery();
 
   useEffect(() => {
-    if (data?.latestQuestion?._id) {
-      localStorage.setItem("latestStoryId", data.latestQuestion._id);
+    if (data?.latestQuestion?.id) {
+      localStorage.setItem("latestStoryId", data.latestQuestion.id);
     }
   }, [data]);
 

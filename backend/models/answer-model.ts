@@ -1,22 +1,22 @@
 import { model, models, Schema } from "mongoose";
 
-// AI дүгнэлтийн төрөл
+
 type SkillAssessment = {
-  skill: string; // "Танин мэдэхүй", "Сэтгэн бодох" гэх мэт
-  subSkill: string; // "Үг таних", "Шалтгаан-үр дагавар" гэх мэт
-  score: number; // 0-100 оноо
+  skill: string; 
+  subSkill: string;
+  score: number; 
   level: "Дутуу" | "Дундаж" | "Сайн" | "Маш сайн";
-  feedback: string; // AI-ын санал зөвлөмж
+  feedback: string; 
 };
 
 type AIAnalysis = {
-  overallScore: number; // Нийт оноо (0-100)
-  skillAssessments: SkillAssessment[]; // Skill тус бүрийн дүгнэлт
-  strengths: string[]; // Давуу талууд
-  improvements: string[]; // Сайжруулах зүйлс
-  recommendations: string[]; // Зөвлөмжүүд
-  analysisDate: Date; // Шинжилгээ хийсэн огноо
-  confidence: number; // AI-ын итгэлцлийн түвшин (0-1)
+  overallScore: number; 
+  skillAssessments: SkillAssessment[]; 
+  strengths: string[]; 
+  improvements: string[]; 
+  recommendations: string[];
+  analysisDate: Date; 
+  confidence: number;
 };
 
 type Answer = {
@@ -33,13 +33,13 @@ type Answer = {
     explanation?: string;
   };
 
-  // ШИНЭ: AI дүгнэлт
+
   aiAnalysis?: AIAnalysis;
 
-  // ШИНЭ: Хариултын дэлгэрэнгүй мэдээлэл
+
   answerMetadata?: {
-    timeSpent: number; // Хариулахад зарцуулсан хугацаа (секунд)
-    attemptCount: number; // Оролдлогын тоо
+    timeSpent: number; 
+    attemptCount: number;
     difficulty: "Амархан" | "Дунд" | "Хэцүү";
     questionType: string; // Асуултын төрөл
   };
@@ -79,7 +79,7 @@ export const AnswerSchema = new Schema<Answer>(
     isCorrect: { type: Boolean, required: true },
     selectedOption: { type: String, required: false },
 
-    // Хуучин option (үргэлжлүүлэх)
+    
     option: {
       type: {
         options: { type: [String], required: true },
@@ -87,7 +87,7 @@ export const AnswerSchema = new Schema<Answer>(
       },
     },
 
-    // ШИНЭ талбарууд
+
     aiAnalysis: {
       type: AIAnalysisSchema,
       required: false,
@@ -110,23 +110,22 @@ export const AnswerSchema = new Schema<Answer>(
   { timestamps: true }
 );
 
-// Index нэмэх - хэрэглэгчийн хариултуудыг хурдан олохын тулд
+
 AnswerSchema.index({ userId: 1, createdAt: -1 });
 AnswerSchema.index({ questionId: 1, userId: 1 });
 
-// ШИНЭ: AI дүгнэлт хийх static метод
+
 AnswerSchema.statics.generateAIAnalysis = async function (userId: string) {
-  // Хэрэглэгчийн сүүлийн хариултуудыг авах
+
   const recentAnswers = await this.find({
     userId,
-    createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }, // Сүүлийн 30 хоног
+    createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
   })
     .populate("questionId")
     .sort({ createdAt: -1 })
     .limit(50);
 
-  // AI дүгнэлт хийх логик энд бичнэ
-  // (Дараагийн алхамд энэ функцийг бүрэн бичнэ)
+
   return null;
 };
 

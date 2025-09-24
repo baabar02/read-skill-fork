@@ -7,6 +7,7 @@ interface QuestionOption {
 }
 
 interface GeneratedQuestion {
+    _id: string;
   question: string;
   skill: string;
   subSkill: string;
@@ -26,8 +27,10 @@ const questionSchema = new Schema<QuestionDoc>(
     text: { type: String, required: true },
     questions: [
       {
+        _id: { type: Schema.Types.ObjectId, auto: true },
         question: { type: String, required: true },
         option: {
+          
           options: [{ type: String, required: true }],
           explanation: { type: String, required: true },
           correctAnswer: { type: String, required: true },

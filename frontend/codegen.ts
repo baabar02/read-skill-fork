@@ -4,6 +4,7 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 // Try to use remote schema first, fallback to local schema
 const remoteSchemaUrl =
   process.env.NEXT_PUBLIC_BACKEND_URL ??
+  
   "https://echo-mind-fizz.onrender.com/graphql";
 const localSchemaPath = "./src/graphql/schema.graphql";
 
@@ -45,3 +46,5 @@ const config: CodegenConfig = {
 };
 
 export default config;
+
+

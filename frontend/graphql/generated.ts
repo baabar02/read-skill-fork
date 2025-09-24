@@ -117,6 +117,7 @@ export type DeleteResponse = {
 
 export type GeneratedQuestion = {
   __typename?: 'GeneratedQuestion';
+  _id: Scalars['ID']['output'];
   option: QuestionOption;
   question: Scalars['String']['output'];
   skill: Scalars['String']['output'];
@@ -358,8 +359,8 @@ export type QueryQuestionArgs = {
 
 export type Question = {
   __typename?: 'Question';
-  _id: Scalars['ID']['output'];
   createdAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
   option?: Maybe<QuestionOption>;
   questions: Array<GeneratedQuestion>;
   text: Scalars['String']['output'];
@@ -369,6 +370,7 @@ export type Question = {
 
 export type QuestionOption = {
   __typename?: 'QuestionOption';
+  _id: Scalars['ID']['output'];
   correctAnswer: Scalars['String']['output'];
   explanation: Scalars['String']['output'];
   options: Array<Scalars['String']['output']>;
@@ -521,7 +523,7 @@ export type GenerateMcqQuestionsMutationVariables = Exact<{
 }>;
 
 
-export type GenerateMcqQuestionsMutation = { __typename?: 'Mutation', generateMCQQuestions: Array<{ __typename?: 'Question', _id: string, title: string, text: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, correctAnswer: string, explanation: string } }> }> };
+export type GenerateMcqQuestionsMutation = { __typename?: 'Mutation', generateMCQQuestions: Array<{ __typename?: 'Question', id: string, title: string, text: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, correctAnswer: string, explanation: string } }> }> };
 
 export type GenerateQuestionsFromTextMutationVariables = Exact<{
   title: Scalars['String']['input'];
@@ -530,7 +532,7 @@ export type GenerateQuestionsFromTextMutationVariables = Exact<{
 }>;
 
 
-export type GenerateQuestionsFromTextMutation = { __typename?: 'Mutation', generateQuestionsFromText: { __typename?: 'Question', text: string, title: string, _id: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } };
+export type GenerateQuestionsFromTextMutation = { __typename?: 'Mutation', generateQuestionsFromText: { __typename?: 'Question', text: string, title: string, id: string, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } };
 
 export type GenerateUserAnalysisMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -580,7 +582,7 @@ export type GetUsersFromUserFileQuery = { __typename?: 'Query', getUsers: Array<
 export type LatestQuestionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LatestQuestionQuery = { __typename?: 'Query', latestQuestion?: { __typename?: 'Question', _id: string, title: string, text: string, createdAt?: string | null, updatedAt?: string | null, questions: Array<{ __typename?: 'GeneratedQuestion', question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } | null };
+export type LatestQuestionQuery = { __typename?: 'Query', latestQuestion?: { __typename?: 'Question', id: string, title: string, text: string, createdAt?: string | null, updatedAt?: string | null, questions: Array<{ __typename?: 'GeneratedQuestion', _id: string, question: string, skill: string, subSkill: string, option: { __typename?: 'QuestionOption', options: Array<string>, explanation: string, correctAnswer: string } }> } | null };
 
 export type LoginUserMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -841,7 +843,7 @@ export const GenerateMcqQuestionsDocument = gql`
     language: $language
     answer: $answer
   ) {
-    _id
+    id
     title
     text
     questions {
@@ -908,7 +910,7 @@ export const GenerateQuestionsFromTextDocument = gql`
     }
     text
     title
-    _id
+    id
   }
 }
     `;
@@ -1264,10 +1266,11 @@ export type GetUsersFromUserFileQueryResult = Apollo.QueryResult<GetUsersFromUse
 export const LatestQuestionDocument = gql`
     query LatestQuestion {
   latestQuestion {
-    _id
+    id
     title
     text
     questions {
+      _id
       question
       skill
       subSkill
