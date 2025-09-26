@@ -16,12 +16,11 @@ export default function StepRead({ onFinish }: StepReadProps) {
   const { data, loading, error } = useLatestQuestionQuery();
 
   useEffect(() => {
-    if (data?.latestQuestion?._id) {
-      localStorage.setItem("latestStoryId", data.latestQuestion._id);
+    if (data?.latestQuestion?.id) {
+      localStorage.setItem("latestStoryId", data.latestQuestion.id);
     }
   }, [data]);
 
- 
   useEffect(() => {
     if (counter > 0) {
       const timer = setTimeout(() => setCounter(counter - 1), 1000);
@@ -73,7 +72,6 @@ export default function StepRead({ onFinish }: StepReadProps) {
                 ⏱ Цаг: {minutes.toString().padStart(2, "0")}:        {" "}
         {seconds.toString().padStart(2, "0")}     {" "}
       </div>
-
       {/* GraphQL-с ирсэн өгүүллэг */}
       <p className="text-lg md:text-xl text-gray-900 leading-relaxed whitespace-pre-wrap">
         {data?.latestQuestion?.text || "Үлгэр олдсонгүй."}
