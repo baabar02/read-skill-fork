@@ -1,6 +1,6 @@
 query LatestQuestion {
   latestQuestion {
-    id
+    _id
     title
     text
     questions {
